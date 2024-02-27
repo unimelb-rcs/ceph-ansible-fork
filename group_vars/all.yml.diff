@@ -1,0 +1,74 @@
+--- all.yml	2020-12-16 10:31:14.995373426 +1100
++++ all.yml	2020-12-16 15:49:27.163932374 +1100
+@@ -62,2 +62,3 @@
+ #configure_firewall: True
++configure_firewall: False
+ 
+@@ -104,2 +105,3 @@
+ #ntp_service_enabled: true
++ntp_service_enabled: false
+ 
+@@ -136,2 +138,3 @@
+ #ceph_origin: dummy
++ceph_origin: repository
+ #valid_ceph_origins:
+@@ -143,2 +146,3 @@
+ #ceph_repository: dummy
++ceph_repository: community
+ #valid_ceph_repository:
+@@ -160,2 +164,6 @@
+ #ceph_stable_repo: "{{ ceph_mirror }}/debian-{{ ceph_stable_release }}"
++ceph_mirror: http://build.melbourne.nectar.org.au/ceph/
++ceph_stable_key: http://build.melbourne.nectar.org.au/ceph/keys/release.asc
++ceph_stable_release: luminous
++ceph_stable_repo: "{{ ceph_mirror }}/rpm-{{ ceph_stable_release }}"
+ 
+@@ -284,2 +292,4 @@
+ #generate_fsid: true
++fsid: "c0eb7dc4-3f6c-42f0-a20b-03c84d5cfbba"
++generate_fsid: false
+ 
+@@ -343,2 +353,3 @@
+ #monitor_interface: interface
++monitor_interface: bond0.3051
+ #monitor_address: x.x.x.x
+@@ -366,2 +377,9 @@
+ #osd_memory_target: 4294967296
++osd_memory_target: 5368709120
++#stg[1-2]   - 125GB RAM - 16 osds - 7.8125/osd
++#stg[3-4]   -  94GB RAM - 16 osds - 5.8750/osd
++#stg[5-8]   - 125GB RAM - 16 osds - 7.8125/osd
++#stg[9-13]  - 187GB RAM - 24 osds - 7.7916/osd
++#stg[22-41] - 125GB RAM - 16 osds - 7.8125/osd
++ 
+ #journal_size: 5120 # OSD journal size in MB
+@@ -369,3 +387,5 @@
+ #public_network: 0.0.0.0/0
++public_network: "172.26.28.0/23"
+ #cluster_network: "{{ public_network | regex_replace(' ', '') }}"
++cluster_network: "172.26.30.0/23"
+ #osd_mkfs_type: xfs
+@@ -537,2 +557,23 @@
+ #ceph_conf_overrides: {}
++ceph_conf_overrides:
++  global:
++    mon_max_pg_per_osd: 300
++
++  osd:
++    bluestore_cache_size: 2147483648
++    bluestore_prefer_deferred_size_hdd: 32768000
++    bluestore_prefer_deferred_size_ssd: 32768000
++    osd_class_update_on_start: false
++    osd_scrub_begin_hour: 19
++    osd_scrub_end_hour: 9
++    osd_deep_scrub_randomize_ratio: 0.00
++    osd_scrub_chunk_min: 1
++    osd_scrub_chunk_max: 5
++    osd_scrub_sleep: 0.2
++    osd_scrub_priority: 1
++    osd_max_backfills: 1
++    osd_recovery_max_active: 1
++    osd_recovery_op_priority: 1
++    osd_client_op_priority: 63
++
+ 

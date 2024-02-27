@@ -1,0 +1,18 @@
+[clients]
+localhost copy_admin_key=true
+
+[mons]
+mon[1:5]a-ceph1-qh2
+
+[mgrs]
+mon[1:5]a-ceph1-qh2
+
+[osds]
+stg[42:68]-ceph1-qh2
+flash[1:10]-ceph1-qh2
+
+[upgradeosds]
+stg[67:68]-ceph1-qh2
+
+[flashosds]
+flash[1:10]-ceph1-qh2

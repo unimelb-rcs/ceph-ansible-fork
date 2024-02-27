@@ -1,0 +1,8 @@
+- name: update ceph-common
+  hosts: osds, flash
+  gather_facts: no
+  ignore_errors: yes
+  ignore_unreachable: yes
+  tasks:
+  - name: update ceph-common
+    command: yum install ceph-common -y

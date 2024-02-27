@@ -1,0 +1,8 @@
+- name: Disable Puppet
+  hosts: mons, osds
+  gather_facts: no
+  ignore_errors: yes
+  ignore_unreachable: yes
+  tasks:
+  - name: disable puppet
+    command: puppet agent --disable "jmamma - puppet disable"

@@ -1,0 +1,17 @@
+
+- name: Restart OSDS
+  hosts: osds flash
+  serial: 1
+  gather_facts: no
+  ignore_errors: yes
+  ignore_unreachable: yes
+  tasks:
+  - name: copy osd restart script
+    copy:
+     src: restart_osds.sh
+     dest: /tmp/restart_osds.sh
+     owner: root
+     group: root
+     mode: 0750
+  - name: restart ceph osds daemon(s)
+    command: /usr/bin/env bash /tmp/restart_osds.sh
