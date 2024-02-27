@@ -45,7 +45,7 @@
 
 - name: set_fact vm_min_free_kbytes
   set_fact:
-    vm_min_free_kbytes: "{{ 4194303 if ansible_facts['memtotal_mb'] >= 49152 else default_vm_min_free_kbytes.stdout }}"
+    vm_min_free_kbytes: "{{ 2054760 if ansible_facts['memtotal_mb'] >= 49152 else default_vm_min_free_kbytes.stdout }}"
 
 - name: apply operating system tuning
   sysctl:
