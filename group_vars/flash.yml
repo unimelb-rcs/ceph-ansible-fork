@@ -1,0 +1,7 @@
+---
+# flash nvme osd nodes
+ceph_conf_overrides:
+  osd:
+    osd_class_update_on_start: false
+    osd_max_scrub: 2
+    osd_scrub_auto_repair: true
