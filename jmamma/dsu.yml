@@ -1,7 +1,7 @@
 ---
 
 - name: Perform full system update on osd nodes
-  hosts: osds
+  hosts: dsuosds
   serial: 1  # Ensures one host is processed at a time
   gather_facts: no
 
@@ -65,11 +65,38 @@
       name: dell-system-update
       state: present
     become: yes
+ 
+  - name: Remove output file
+    command: rm -f 'dsu_output.xml'
+    args:
+      chdir: "/tmp"  # Specify the directory where you want to store the inventory XML file
+
+  - name: Generate inventory XML file
+    command: dsu --output-inventory-xml=dsu_output.xml
+    args:
+      chdir: "/tmp"  # Specify the directory where you want to store the inventory XML file
+
+  - name: Convert UTF-16 to UTF-8
+    command: "iconv -f UTF-16 -t UTF-8 dsu_output.xml -o dsu_output_utf8.xml"
+    args:
+      chdir: "/tmp"  # Specify the directory where dsu_output.xml is located
+
+  - name: Remove lines containing 'NVME' or 'NVMe' along with the following two lines
+    command: "sed -i '/NVME\\|NVMe/{N;N;d;}' dsu_output_utf8.xml"
+    args:
+      chdir: "/tmp"  # Specify the directory where dsu_output_utf8.xml is located
+
+  - name: Convert UTF-8 to UTF-16
+    command: "iconv -f UTF-8 -t UTF-16 dsu_output_utf8.xml -o dsu_output_utf16.xml"
+    args:
+      chdir: "/tmp"  # Specify the directory where dsu_output_utf8.xml is located
 
   - name: Execute dsu with -n option
-    command: dsu -n
-    register: dsu_output
+    command: dsu --input-inventory-file=dsu_output_utf16.xml -n
+    args:
+      chdir: "/tmp"  # Specify the directory where dsu_output_utf16.xml is located
     ignore_errors: true
+    register: dsu_output
  
   - name: Reboot the node
     reboot:
