@@ -3,12 +3,7 @@ mon[1:3]a-test-ceph1
 mon4-test-ceph1
 
 [osds]
-stg9-test-ceph1
-stg10-test-ceph1
-stg11-test-ceph1
-stg12-test-ceph1
-stg13-test-ceph1
-stg14-test-ceph1
+stg[1:8]-test-ceph1
 flash[1:7]-test-ceph1
 
 [flashosds]
