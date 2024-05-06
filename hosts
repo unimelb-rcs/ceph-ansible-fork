@@ -9,26 +9,25 @@ mon[1:3]-test-ceph3
 
 [mdss]
 mds1-test-ceph3
+mds2-test-ceph3
+
+[rgws]
+rgw1-test-ceph3
 
 [osds]
-stg[1:10]-test-ceph3
-stg[12:13]-test-ceph3
 stg[14:22]-test-ceph3
 stg[25:26]-test-ceph3
 
 [dsu]
-stg[4:10]-test-ceph3
-stg[12:13]-test-ceph3
 stg[14:22]-test-ceph3
 stg[25:26]-test-ceph3
 
 
 [test]
-stg[1:2]-test-ceph3
+stg[25:26]-test-ceph3
 
 [fix_host]
-stg1-test-ceph3
+stg1a-test-ceph3
 
 [newosds]
-stg[14:22]-test-ceph3
-stg[25:26]-test-ceph3
+stg[1:12]a-test-ceph3

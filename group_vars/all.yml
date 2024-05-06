@@ -398,6 +398,7 @@ cluster_network: "172.26.17.128/25"
 ## Rados Gateway options
 #
 #radosgw_frontend_type: beast # For additional frontends see: https://docs.ceph.com/en/octopus/radosgw/frontends/
+radosgw_frontend_port: 80
 
 #radosgw_civetweb_port: 8080
 #radosgw_civetweb_num_threads: 512
@@ -412,6 +413,9 @@ cluster_network: "172.26.17.128/25"
 #radosgw_frontend_ssl_certificate_data: "" # certificate contents to be written to path defined by radosgw_frontend_ssl_certificate
 #radosgw_frontend_options: "{{ radosgw_civetweb_options if radosgw_frontend_type == 'civetweb' else '' }}"
 #radosgw_thread_pool_size: 512
+radosgw_frontend_options: "access_log_file=/var/log/ceph/radosgw_access.log error_log_file=/var/log/ceph/radosgw_error.log"
+radosgw_thread_pool_size: 800
+radosgw_interface: bond0.3046
 
 
 # You must define either radosgw_interface, radosgw_address.
@@ -556,6 +560,8 @@ handler_health_osd_check: true
 ceph_conf_overrides:
   global:
     mon_max_pg_per_osd: 300
+    osd_deep_scrub_interval: 1814400.0
+    osd_scrub_max_interval: 604800
   osd:
     bluestore_cache_size: 2147483648
     bluestore_prefer_deferred_size_hdd: 32768000
@@ -564,10 +570,8 @@ ceph_conf_overrides:
     osd_scrub_begin_hour: 19
     osd_scrub_end_hour: 9
     osd_deep_scrub_randomize_ratio: 0.00
-    osd_deep_scrub_interval: 1209600
     osd_scrub_chunk_min: 1
     osd_scrub_chunk_max: 5
-    osd_scrub_sleep: 0.2
     osd_scrub_priority: 1
     osd_max_backfills: 2
     osd_recovery_max_active: 1
