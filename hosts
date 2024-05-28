@@ -27,7 +27,6 @@ stg[25:26]-test-ceph3
 stg[25:26]-test-ceph3
 
 [fix_host]
-stg1a-test-ceph3
+stg14-test-ceph3
 
 [newosds]
-stg[1:12]a-test-ceph3

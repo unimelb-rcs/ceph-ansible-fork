@@ -454,7 +454,7 @@ radosgw_interface: bond0.3046
 # OSD handler checks
 #handler_health_osd_check_retries: 40
 #handler_health_osd_check_delay: 30
-handler_health_osd_check: true
+#handler_health_osd_check: true
 #
 # MDS handler checks
 #handler_health_mds_check_retries: 5
