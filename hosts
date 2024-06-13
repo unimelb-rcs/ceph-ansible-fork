@@ -1,0 +1,14 @@
+[clients]
+localhost copy_admin_key=true
+
+[monitoring]
+mon4-test-ceph2
+
+[mons]
+mon[2:4]-test-ceph2
+
+[mgrs]
+mon[2:4]-test-ceph2
+
+[osds]
+stg[8:14]-test-ceph2
