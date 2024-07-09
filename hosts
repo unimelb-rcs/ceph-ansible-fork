@@ -12,3 +12,6 @@ mon[2:4]-test-ceph2
 
 [osds]
 stg[8:14]-test-ceph2
+
+[mdss]
+mon4-test-ceph2
