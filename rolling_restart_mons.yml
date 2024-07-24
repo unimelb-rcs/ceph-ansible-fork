@@ -1,0 +1,96 @@
+---
+# Author: 	William Xiong <william.xiong@unimelb.edu.au>
+# Date: 	22/07/2024
+# This playbook performs a rolling restart on all mon nodes in the 'mons' group.
+# Ceph health and quorum status is checked before and after every restart. 
+
+- name: Rolling Restart all Mon nodes
+  hosts: mons
+  gather_facts: no
+  serial: 1
+
+  tasks:
+  - name: Retreive Ceph Health
+    local_action:
+      module: command
+      cmd: ceph health
+    register: health_status
+
+  - name: Exit if ceph cluster has bad health
+    fail: 
+      msg: "Ceph Health NOT OK"
+    when: health_status.stdout != "HEALTH_OK"
+
+  - name: Retreive Quorum Status
+    local_action:
+      module: shell
+      cmd: ceph status | grep 'out of quorum'
+    register: quorum_status
+    failed_when: quorum_status.rc != 1 and quorum_status.rc != 0
+
+  - name: Exit if mons are out of quorum
+    fail:
+      msg: "Monitor Nodes are out of Quorum"
+    when: quorum_status.stdout != ""
+  
+  - name: Restart Mon Service on {{ inventory_hostname }}
+    systemd:
+      state: restarted
+      name: ceph-mon@{{ inventory_hostname }}.service
+
+  - name: Pause for 10 seconds
+    pause:
+      seconds: 10
+
+  - name: Get Service Status
+    systemd:
+      name: ceph-mon@{{ inventory_hostname }}.service
+    register: ceph_mon_service
+
+  - name: Exit if Service is not Active
+    fail:
+      msg: 'Restart Failed - Service on {{ inventory_hostname }} is not active.'
+    when: ceph_mon_service.status.ActiveState != 'active'
+
+  - name: Retrieve hostnames in quorum 
+    local_action:
+      module: shell
+      cmd: 'ceph mon stat | grep {{ inventory_hostname }}'
+    register: quorum_hostnames
+  
+  - name: Exit if {{ inventory_hostname }} is not in quorum
+    fail:
+      msg: "{{ inventory_hostname }} missing from 'ceph mon stat'"
+    when: quorum_hostnames.stdout == ""
+
+- name: Perform Final Health Checks 
+  hosts: localhost
+  gather_facts: no
+  tasks:
+  - name: Final health check - Retreive Ceph Health
+    local_action:
+      module: command
+      cmd: ceph health
+    register: health_status
+
+  - name: Final health check - Exit if ceph cluster has bad health
+    fail:
+      msg: "Ceph Health NOT OK"
+    when: health_status.stdout != "HEALTH_OK"
+
+  - name: Final health check - Retreive Quorum Status
+    local_action:
+      module: shell
+      cmd: ceph status | grep 'out of quorum'
+    register: quorum_status
+    failed_when: quorum_status.rc != 1 and quorum_status.rc != 0
+
+  - name: Final health check - Exit if mons are out of quorum
+    fail:
+      msg: "Monitor Nodes are out of Quorum"
+    when: quorum_status.stdout != ""
+  
+  - name: Health Check Passed. All nodes rebooted.
+    debug:
+       msg: Operation Success. Exiting.
+
