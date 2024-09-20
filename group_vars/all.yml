@@ -343,17 +343,21 @@ monitor_interface: bond0.3057
 #  cephfs_data_pool:
 #    name: "{{ cephfs_data if cephfs_data is defined else 'cephfs_data' }}"
 #    target_size_ratio: 0.2
-cephfs: cephfs_wx # name of the ceph filesystem
+cephfs: cephfs_wx_ecc # name of the ceph filesystem
 cephfs_data_pool:
-  name: "{{ cephfs_data if cephfs_data is defined else 'cephfs_data' }}"
+  name: "{{ cephfs_data if cephfs_data is defined else 'cephfs_data_ecc' }}"
   pg_autoscale_mode: false
-  pg_num: 4096
-  pgp_num: 4096
+  pg_num: 1024
+  pgp_num: 1024
+  pool_type: erasure
+  erasure_profile: ecprofile-k6-m3_hdd 
 cephfs_metadata_pool:
-  name: "{{ cephfs_metadata if cephfs_metadata is defined else 'cephfs_metadata' }}"
+  name: "{{ cephfs_metadata if cephfs_metadata is defined else 'cephfs_metadata_ecc' }}"
   pg_autoscale_mode: false
-  pg_num: 32
-  pgp_num: 32
+  pg_num: 4
+  pgp_num: 4
+  pool_type: erasure
+  erasure_profile: ecprofile-k6-m3_nvme
 cephfs_pools:
   - "{{ cephfs_data_pool }}"
   - "{{ cephfs_metadata_pool }}"
