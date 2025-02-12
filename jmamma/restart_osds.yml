@@ -1,0 +1,9 @@
+- name: Restart OSDs
+  hosts: osds
+  ignore_errors: yes
+  ignore_unreachable: yes
+  serial: 1
+  tasks:
+  - name: restart ceph osds daemon(s)
+    command: /usr/bin/env bash /tmp/restart_osd_daemon.sh
+

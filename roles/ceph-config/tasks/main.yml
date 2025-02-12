@@ -93,6 +93,22 @@
     - name: set_fact num_osds (add existing osds)
       set_fact:
         num_osds: "{{ num_osds | int + (lvm_list.stdout | default('{}') | from_json | dict2items | map(attribute='value') | flatten | map(attribute='devices') | sum(start=[]) | difference(lvm_volumes | default([]) | map(attribute='data')) | length | int) }}"
+      when: fix_num_osds is not defined
+
+    - name: BUGFIX - set_fact num_osds (add existing osds)
+      set_fact:
+        num_osds: "{{ num_osds | int + (lvm_list.stdout | default('{}') | from_json | dict2items | map(attribute='value') | flatten | map(attribute='devices') | select('defined') | list | length | int) }}"
+      when: fix_num_osds is defined and fix_num_osds | bool
+
+    - name: BUGFIX - Print new num_osds number
+      debug:
+        var: num_osds
+      when: fix_num_osds is defined and fix_num_osds | bool
+
+    - name: BUGFIX - Please confirm num_osds now corresponds to the number of osds on the host.
+      pause:
+        prompt: "Press Enter to continue"
+      when: fix_num_osds is defined and fix_num_osds | bool
 
 - name: set osd related config facts
   when: inventory_hostname in groups.get(osd_group_name, [])
