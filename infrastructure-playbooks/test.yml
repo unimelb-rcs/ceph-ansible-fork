@@ -1,0 +1,10 @@
+- name: Set osd_group_name variable
+  hosts: localhost
+  gather_facts: false
+  vars:
+    osd_group_name: "{{ osd_group_name | default('osds') }}"
+
+  tasks:
+    - name: Example task using osd_group_name
+      debug:
+        msg: "The osd_group_name is {{ osd_group_name }}"
