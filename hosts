@@ -10,8 +10,8 @@ flash[1:7]-test-ceph1
 flash[1:7]-test-ceph1
 
 [mdss]
-mds2a-test-ceph1
 mds1a-test-ceph1
+mds2a-test-ceph1
 
 [rgws]
 rgw[1:2]-test-ceph1
@@ -21,6 +21,9 @@ stg[1:8]-test-ceph1
 
 [restartosds]
 stg[1:2]-test-ceph1
+
+[rhel9_upgrades]
+mon1a-test-ceph1
 
 [puppet_agents]
 #stg[7:8]-test-ceph1.mgmt.storage.unimelb.edu.au

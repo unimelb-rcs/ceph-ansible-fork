@@ -1,0 +1,233 @@
+---
+# This playbook does a rolling update for all the Ceph services
+#
+# The value of 'serial:' adjusts the number of servers to be updated simultaneously.
+# We recommend a value of 1, which means hosts of a group (e.g: monitor) will be
+# upgraded one by one. It is really crucial for the update process to happen
+# in a serialized fashion. DO NOT CHANGE THIS VALUE.
+#
+#
+# If you run a Ceph community version, you have to change the variable: ceph_stable_release to the new release
+#
+# If you run Red Hat Ceph Storage and are doing a **major** update (e.g: from 2 to 3), you have to change the ceph_rhcs_version to a newer one
+#
+
+- name: confirm whether user really meant to upgrade the cluster
+  hosts: localhost
+  tags: always
+  become: false
+  gather_facts: false
+  vars:
+    - mgr_group_name: mgrs
+
+  vars_prompt:
+    - name: ireallymeanit
+      prompt: Are you sure you want to upgrade the cluster?
+      default: 'no'
+      private: no
+
+  tasks:
+    - name: exit playbook, if user did not mean to upgrade cluster
+      fail:
+        msg: >
+          "Exiting rolling_update.yml playbook, cluster was NOT upgraded.
+           To upgrade the cluster, either say 'yes' on the prompt or
+           use `-e ireallymeanit=yes` on the command line when
+           invoking the playbook"
+      when: ireallymeanit != 'yes'
+
+    - name: import_role ceph-defaults
+      import_role:
+        name: ceph-defaults
+
+    - name: check if a legacy grafana-server group exists
+      import_role:
+        name: ceph-facts
+        tasks_from: convert_grafana_server_group_name.yml
+      when: groups.get((grafana_server_group_name | default('grafana-server')), []) | length > 0
+
+
+- name: gather facts and check the init system
+  hosts:
+    - "{{ mon_group_name|default('mons') }}"
+    - "{{ osd_group_name|default('osds') }}"
+    - "{{ mds_group_name|default('mdss') }}"
+    - "{{ rgw_group_name|default('rgws') }}"
+    - "{{ mgr_group_name|default('mgrs') }}"
+    - "{{ rbdmirror_group_name|default('rbdmirrors') }}"
+    - "{{ nfs_group_name|default('nfss') }}"
+    - "{{ client_group_name|default('clients') }}"
+    - "{{ iscsi_gw_group_name|default('iscsigws') }}"
+    - "{{ monitoring_group_name|default('monitoring') }}"
+  tags: always
+  any_errors_fatal: True
+  become: True
+  gather_facts: False
+  vars:
+    delegate_facts_host: True
+  tasks:
+    - debug: msg="gather facts on all Ceph hosts for following reference"
+
+    - import_role:
+        name: ceph-defaults
+
+    - name: gather facts
+      setup:
+        gather_subset:
+          - 'all'
+          - '!facter'
+          - '!ohai'
+      when: not delegate_facts_host | bool or inventory_hostname in groups.get(client_group_name, [])
+
+    - name: gather and delegate facts
+      setup:
+        gather_subset:
+          - 'all'
+          - '!facter'
+          - '!ohai'
+      delegate_to: "{{ item }}"
+      delegate_facts: True
+      with_items: "{{ groups['all'] | difference(groups.get('clients', [])) }}"
+      run_once: true
+      when: delegate_facts_host | bool
+
+    - name: set_fact rolling_update
+      set_fact:
+        rolling_update: true
+
+    - import_role:
+        name: ceph-facts
+
+    - import_role:
+        name: ceph-infra
+      tags: ceph_infra
+
+    - import_role:
+        name: ceph-validate
+
+    - import_role:
+        name: ceph-container-engine
+      when:
+        - (group_names != ['clients']) or (inventory_hostname == groups.get('clients', [''])|first)
+        - (containerized_deployment | bool) or (dashboard_enabled | bool)
+
+    - import_role:
+        name: ceph-container-common
+        tasks_from: registry
+      when:
+        - (group_names != ['clients']) or (inventory_hostname == groups.get('clients', [''])|first)
+        - (containerized_deployment | bool) or (dashboard_enabled | bool)
+        - ceph_docker_registry_auth | bool
+
+    - name: check ceph release in container image
+      when:
+        - groups.get(mon_group_name, []) | length > 0
+        - containerized_deployment | bool
+      delegate_to: "{{ groups[mon_group_name][0] }}"
+      run_once: true
+      block:
+        - name: get the ceph release being deployed
+          command: "{{ ceph_cmd }} --cluster {{ cluster }} --version"
+          register: ceph_version
+          changed_when: false
+
+        - name: check ceph release being deployed
+          fail:
+            msg: "This version of ceph-ansible is intended for upgrading to Ceph Quincy only."
+          when: "'quincy' not in ceph_version.stdout.split()"
+
+
+
+- name: upgrade ceph rgws cluster
+  vars:
+    upgrade_ceph_packages: True
+  hosts: "{{ rgw_group_name|default('rgws') }}"
+  tags: rgws
+  serial: 1
+  become: True
+  gather_facts: false
+  tasks:
+
+    - import_role:
+        name: ceph-defaults
+    - import_role:
+        name: ceph-facts
+
+    - name: stop ceph rgw when upgrading from stable-3.2
+      systemd:
+        name: ceph-radosgw@rgw.{{ ansible_facts['hostname'] }}
+        state: stopped
+        enabled: no
+        masked: yes
+      ignore_errors: True
+
+    - name: stop ceph rgw
+      systemd:
+        name: ceph-radosgw@rgw.{{ ansible_facts['hostname'] }}.{{ item.instance_name }}
+        state: stopped
+        enabled: no
+        masked: yes
+      with_items: "{{ rgw_instances }}"
+
+    - import_role:
+        name: ceph-handler
+    - import_role:
+        name: ceph-common
+      when: not containerized_deployment | bool
+    - import_role:
+        name: ceph-container-common
+      when: containerized_deployment | bool
+    - import_role:
+        name: ceph-config
+    - import_role:
+        name: ceph-rgw
+
+
+- name: upgrade ceph nfs node
+  vars:
+    upgrade_ceph_packages: True
+  hosts: "{{ nfs_group_name|default('nfss') }}"
+  tags: nfss
+  serial: 1
+  become: True
+  gather_facts: false
+  tasks:
+    # failed_when: false is here so that if we upgrade
+    # from a version of ceph that does not have nfs-ganesha
+    # then this task will not fail
+    - name: stop ceph nfs
+      systemd:
+        name: nfs-ganesha
+        state: stopped
+        enabled: no
+        masked: yes
+      failed_when: false
+      when: not containerized_deployment | bool
+
+    - name: systemd stop nfs container
+      systemd:
+        name: ceph-nfs@{{ ceph_nfs_service_suffix | default(ansible_facts['hostname']) }}
+        state: stopped
+        enabled: no
+        masked: yes
+      failed_when: false
+      when:
+        - ceph_nfs_enable_service | bool
+        - containerized_deployment | bool
+
+    - import_role:
+        name: ceph-defaults
+    - import_role:
+        name: ceph-facts
+    - import_role:
+        name: ceph-handler
+    - import_role:
+        name: ceph-common
+      when: not containerized_deployment | bool
+    - import_role:
+        name: ceph-container-common
+      when: containerized_deployment | bool
+    - import_role:
+        name: ceph-config
+    - import_role:
+        name: ceph-nfs
