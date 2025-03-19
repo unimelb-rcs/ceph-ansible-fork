@@ -1,0 +1,343 @@
+---
+# This playbook does a rolling update for all the Ceph services
+#
+# The value of 'serial:' adjusts the number of servers to be updated simultaneously.
+# We recommend a value of 1, which means hosts of a group (e.g: monitor) will be
+# upgraded one by one. It is really crucial for the update process to happen
+# in a serialized fashion. DO NOT CHANGE THIS VALUE.
+#
+#
+# If you run a Ceph community version, you have to change the variable: ceph_stable_release to the new release
+
+- name: Confirm whether user really meant to upgrade the cluster
+  hosts: localhost
+  tags: always
+  become: false
+  gather_facts: false
+  vars:
+    mgr_group_name: mgrs
+
+  vars_prompt:
+    - name: ireallymeanit  # noqa: name[casing]
+      prompt: Are you sure you want to upgrade the cluster?
+      default: 'no'
+      private: false
+
+  tasks:
+    - name: Exit playbook, if user did not mean to upgrade cluster
+      ansible.builtin.fail:
+        msg: >
+          "Exiting rolling_update.yml playbook, cluster was NOT upgraded.
+           To upgrade the cluster, either say 'yes' on the prompt or
+           use `-e ireallymeanit=yes` on the command line when
+           invoking the playbook"
+      when: ireallymeanit != 'yes'
+
+    - name: Import_role ceph-defaults
+      ansible.builtin.import_role:
+        name: ceph-defaults
+
+
+- name: Gather facts and check the init system
+  hosts:
+    - "{{ mon_group_name|default('mons') }}"
+    - "{{ osd_group_name|default('osds') }}"
+    - "{{ mds_group_name|default('mdss') }}"
+    - "{{ rgw_group_name|default('rgws') }}"
+    - "{{ mgr_group_name|default('mgrs') }}"
+    - "{{ rbdmirror_group_name|default('rbdmirrors') }}"
+    - "{{ nfs_group_name|default('nfss') }}"
+    - "{{ client_group_name|default('clients') }}"
+    - "{{ monitoring_group_name|default('monitoring') }}"
+  tags: always
+  any_errors_fatal: true
+  become: true
+  gather_facts: false
+  vars:
+    delegate_facts_host: true
+  tasks:
+    - name: Gather facts on all Ceph hosts for following reference
+      ansible.builtin.debug:
+        msg: "gather facts on all Ceph hosts for following reference"
+
+    - name: Import ceph-defaults role
+      ansible.builtin.import_role:
+        name: ceph-defaults
+
+    - name: Gather facts
+      ansible.builtin.setup:
+        gather_subset:
+          - 'all'
+          - '!facter'
+          - '!ohai'
+      when: not delegate_facts_host | bool or inventory_hostname in groups.get(client_group_name, [])
+
+    - name: Gather and delegate facts
+      ansible.builtin.setup:
+        gather_subset:
+          - 'all'
+          - '!facter'
+          - '!ohai'
+      delegate_to: "{{ item }}"
+      delegate_facts: true
+      with_items: "{{ groups['all'] | difference(groups.get('clients', [])) }}"
+      run_once: true
+      when: delegate_facts_host | bool
+
+    - name: Set_fact rolling_update
+      ansible.builtin.set_fact:
+        rolling_update: true
+
+    - name: Import ceph-facts role
+      ansible.builtin.import_role:
+        name: ceph-facts
+
+    - name: Import ceph-infra role
+      ansible.builtin.import_role:
+        name: ceph-infra
+      tags: ceph_infra
+
+    - name: Import ceph-validate role
+      ansible.builtin.import_role:
+        name: ceph-validate
+
+    - name: Import ceph-container-engine role
+      ansible.builtin.import_role:
+        name: ceph-container-engine
+      when:
+        - (group_names != ['clients']) or (inventory_hostname == groups.get('clients', [''])|first)
+        - (containerized_deployment | bool) or (dashboard_enabled | bool)
+
+    - name: Import ceph-container-common role
+      ansible.builtin.import_role:
+        name: ceph-container-common
+        tasks_from: registry
+      when:
+        - (group_names != ['clients']) or (inventory_hostname == groups.get('clients', [''])|first)
+        - (containerized_deployment | bool) or (dashboard_enabled | bool)
+        - ceph_docker_registry_auth | bool
+
+    - name: Check ceph release in container image
+      when:
+        - groups.get(mon_group_name, []) | length > 0
+        - containerized_deployment | bool
+      delegate_to: "{{ groups[mon_group_name][0] }}"
+      run_once: true
+      block:
+        - name: Get the ceph release being deployed
+          ansible.builtin.command: "{{ ceph_cmd }} --cluster {{ cluster }} --version"
+          register: ceph_version
+          changed_when: false
+
+        - name: Check ceph release being deployed
+          ansible.builtin.fail:
+            msg: "This version of ceph-ansible is intended for upgrading to Ceph Squid only."
+          when: "'squid' not in ceph_version.stdout.split()"
+
+
+- name: Set osd flags
+  hosts: "{{ osd_group_name | default('osds') }}"
+  tags: osds
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Import ceph-defaults
+      ansible.builtin.import_role:
+        name: ceph-defaults
+
+    - name: Import ceph-facts role
+      ansible.builtin.import_role:
+        name: ceph-facts
+        tasks_from: container_binary.yml
+
+    - name: Set osd flags, disable autoscaler and balancer
+      run_once: true
+      delegate_to: "{{ groups[mon_group_name][0] }}"
+      block:
+        - name: Get pool list
+          ansible.builtin.command: "{{ ceph_cmd }} --cluster {{ cluster }} osd pool ls detail -f json"
+          register: pool_list
+          changed_when: false
+          check_mode: false
+
+        - name: Get balancer module status
+          ansible.builtin.command: "{{ ceph_cmd }} --cluster {{ cluster }} balancer status -f json"
+          register: balancer_status_update
+          run_once: true
+          changed_when: false
+          check_mode: false
+
+        - name: Set_fact pools_pgautoscaler_mode
+          ansible.builtin.set_fact:
+            pools_pgautoscaler_mode: "{{ pools_pgautoscaler_mode | default([]) | union([{'name': item.pool_name, 'mode': item.pg_autoscale_mode}]) }}"
+          with_items: "{{ pool_list.stdout | default('{}') | from_json }}"
+
+        - name: Disable balancer
+          ansible.builtin.command: "{{ ceph_cmd }} --cluster {{ cluster }} balancer off"
+          changed_when: false
+          when: (balancer_status_update.stdout | from_json)['active'] | bool
+
+        - name: Disable pg autoscale on pools
+          ceph_pool:
+            name: "{{ item.name }}"
+            cluster: "{{ cluster }}"
+            pg_autoscale_mode: false
+          with_items: "{{ pools_pgautoscaler_mode }}"
+          when:
+            - pools_pgautoscaler_mode is defined
+            - item.mode == 'on'
+          environment:
+            CEPH_CONTAINER_IMAGE: "{{ ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment | bool else None }}"
+            CEPH_CONTAINER_BINARY: "{{ container_binary }}"
+
+        - name: Set osd flags
+          ceph_osd_flag:
+            name: "{{ item }}"
+            cluster: "{{ cluster }}"
+          environment:
+            CEPH_CONTAINER_IMAGE: "{{ ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment | bool else None }}"
+            CEPH_CONTAINER_BINARY: "{{ container_binary }}"
+          with_items:
+            - noout
+            - nodeep-scrub
+
+- name: Upgrade ceph osds cluster
+  vars:
+    health_osd_check_retries: 600
+    health_osd_check_delay: 2
+    upgrade_ceph_packages: true
+  hosts: osds
+  tags: osds
+  serial: 1
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Import ceph-defaults role
+      ansible.builtin.import_role:
+        name: ceph-defaults
+
+    - name: Import ceph-facts role
+      ansible.builtin.import_role:
+        name: ceph-facts
+
+    - name: Get osd numbers - non container
+      ansible.builtin.shell: if [ -d /var/lib/ceph/osd ] ; then ls /var/lib/ceph/osd | sed 's/.*-//' ; fi  # noqa: risky-shell-pipe
+      register: osd_ids
+      changed_when: false
+
+    - name: Set num_osds
+      ansible.builtin.set_fact:
+        num_osds: "{{ osd_ids.stdout_lines | default([]) | length }}"
+
+    - name: Set_fact container_exec_cmd_osd
+      ansible.builtin.set_fact:
+        container_exec_cmd_update_osd: "{{ container_binary }} exec ceph-mon-{{ hostvars[groups[mon_group_name][0]]['ansible_facts']['hostname'] }}"
+      when: containerized_deployment | bool
+
+    - name: Stop ceph osd
+      ansible.builtin.systemd:
+        name: ceph-osd@{{ item }}
+        state: stopped
+        enabled: false
+        masked: true
+      with_items: "{{ osd_ids.stdout_lines }}"
+
+    - name: Import ceph-handler role
+      ansible.builtin.import_role:
+        name: ceph-handler
+
+    - name: Import ceph-common role
+      ansible.builtin.import_role:
+        name: ceph-common
+      when: not containerized_deployment | bool
+
+    - name: Import ceph-container-common role
+      ansible.builtin.import_role:
+        name: ceph-container-common
+      when: containerized_deployment | bool
+
+    - name: Import ceph-config role
+      ansible.builtin.import_role:
+        name: ceph-config
+
+    - name: Import ceph-osd role
+      ansible.builtin.import_role:
+        name: ceph-osd
+
+    - name: Scan ceph-disk osds with ceph-volume if deploying nautilus
+      ceph_volume_simple_scan:
+        cluster: "{{ cluster }}"
+        force: true
+      environment:
+        CEPH_VOLUME_DEBUG: "{{ ceph_volume_debug }}"
+      when: not containerized_deployment | bool
+
+    - name: Activate scanned ceph-disk osds and migrate to ceph-volume if deploying nautilus
+      ceph_volume_simple_activate:
+        cluster: "{{ cluster }}"
+        osd_all: true
+      environment:
+        CEPH_VOLUME_DEBUG: "{{ ceph_volume_debug }}"
+      when: not containerized_deployment | bool
+
+    - name: Waiting for clean pgs...
+      ansible.builtin.command: "{{ container_exec_cmd_update_osd | default('') }} ceph --cluster {{ cluster }} pg stat --format json"
+      register: ceph_health_post
+      until: >
+        (((ceph_health_post.stdout | from_json).pg_summary.num_pg_by_state | length) > 0)
+        and
+        (((ceph_health_post.stdout | from_json).pg_summary.num_pg_by_state | selectattr('name', 'search', '^active\\+clean') | map(attribute='num') | list | sum) == (ceph_health_post.stdout | from_json).pg_summary.num_pgs)
+      delegate_to: "{{ groups[mon_group_name][0] }}"
+      changed_when: false
+      retries: "{{ health_osd_check_retries }}"
+      delay: "{{ health_osd_check_delay }}"
+
+
+- name: Complete osd upgrade
+  hosts: "{{ osd_group_name | default('osds') }}"
+  tags: osds
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Import ceph-defaults role
+      ansible.builtin.import_role:
+        name: ceph-defaults
+
+    - name: Import ceph-facts role
+      ansible.builtin.import_role:
+        name: ceph-facts
+        tasks_from: container_binary.yml
+
+    - name: Unset osd flags, re-enable pg autoscaler and balancer
+      run_once: true
+      delegate_to: "{{ groups[mon_group_name][0] }}"
+      block:
+        - name: Re-enable pg autoscale on pools
+          ceph_pool:
+            name: "{{ item.name }}"
+            cluster: "{{ cluster }}"
+            pg_autoscale_mode: true
+          with_items: "{{ pools_pgautoscaler_mode }}"
+          when:
+            - pools_pgautoscaler_mode is defined
+            - item.mode == 'on'
+          environment:
+            CEPH_CONTAINER_IMAGE: "{{ ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment | bool else None }}"
+            CEPH_CONTAINER_BINARY: "{{ container_binary }}"
+
+        - name: Unset osd flags
+          ceph_osd_flag:
+            name: "{{ item }}"
+            cluster: "{{ cluster }}"
+            state: absent
+          environment:
+            CEPH_CONTAINER_IMAGE: "{{ ceph_docker_registry + '/' + ceph_docker_image + ':' + ceph_docker_image_tag if containerized_deployment | bool else None }}"
+            CEPH_CONTAINER_BINARY: "{{ container_binary }}"
+          with_items:
+            - noout
+            - nodeep-scrub
+
+        - name: Re-enable balancer
+          ansible.builtin.command: "{{ ceph_cmd }} --cluster {{ cluster }} balancer on"
+          changed_when: false
+          when: (balancer_status_update.stdout | from_json)['active'] | bool
