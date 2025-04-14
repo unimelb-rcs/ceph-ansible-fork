@@ -1,0 +1,12 @@
+---
+- name: Copy Ceph Crash Keyring to OSDs
+  hosts: osds
+  become: true
+
+  tasks:
+    - name: Copy Ceph Crash Keyring to OSD nodes
+      copy:
+        src: /etc/ceph/ceph.client.crash.keyring  # Specify the path to your crash keyring file
+        dest: /etc/ceph/                          # Specify the destination directory on OSD nodes
+        mode: 0600                                # Set appropriate permissions on the keyring file
+

@@ -1,0 +1,139 @@
+---
+
+- name: Perform full system update on osd nodes
+  hosts: dsuosds-parallel
+  strategy: free
+  #serial: 1  # Ensures one host is processed at a time
+  gather_facts: no
+
+#  pre_tasks:
+#    # Set the noout flag at the beginning of the playbook
+#    - name: Set OSD noout
+#      delegate_to: localhost  # Assuming you're executing this on a node with ceph CLI access
+#      command: ceph osd set noout
+#      become: yes
+#      run_once: true
+
+  tasks:
+  - name: Wait until Ceph cluster is healthy with no OSDs down
+    delegate_to: localhost  # This is assumed to be executed on a node where `ceph` CLI is accessible
+    command: ceph health detail
+    register: ceph_health
+    until: "'HEALTH_OK' in ceph_health.stdout and 'down' not in ceph_health.stdout"
+    until: 
+      - "'down' not in ceph_health.stdout | lower"
+      - "'degraded' not in ceph_health.stdout | lower"
+      - "'error' not in ceph_health.stdout | lower"
+    retries: 100  # Adjust as needed, this will retry 30 times
+    delay: 30  # Wait 10 seconds between retries. Adjust as needed.
+    become: yes
+    changed_when: false
+
+  - name: Stop all OSDs on the current host
+    command: systemctl stop ceph-osd@*.service
+    become: yes
+
+  - name: Check the status of all Ceph OSD services
+    command: systemctl is-active ceph-osd@*.service
+    register: osd_status
+    become: yes
+    changed_when: false
+    failed_when: osd_status.rc == 0
+
+  - name: Fail if any Ceph OSD service is still running
+    fail:
+      msg: "Some Ceph OSD services are still running!"
+    when: "'active' in osd_status.stdout"
+
+  - name: copy dsu bootstrap
+    copy:
+     src: bootstrap.sh
+     dest: /tmp/bootstrap.sh
+     owner: root
+     group: root
+     mode: 0750
+
+  - name: run dsu bootstrap
+    shell: /usr/bin/env bash /tmp/bootstrap.sh
+    become: yes
+
+  - name: Install dell-system-update
+    yum:
+      name: dell-system-update
+      state: present
+    become: yes
+ 
+  - name: Remove output file
+    command: rm -f 'dsu_output.xml'
+    args:
+      chdir: "/tmp"  # Specify the directory where you want to store the inventory XML file
+
+  - name: Generate inventory XML file
+    command: dsu --output-inventory-xml=dsu_output.xml
+    args:
+      chdir: "/tmp"  # Specify the directory where you want to store the inventory XML file
+
+  - name: Convert UTF-16 to UTF-8
+    command: "iconv -f UTF-16 -t UTF-8 dsu_output.xml -o dsu_output_utf8.xml"
+    args:
+      chdir: "/tmp"  # Specify the directory where dsu_output.xml is located
+
+  - name: Remove lines containing 'NVME' or 'NVMe' along with the following two lines
+    command: "sed -i '/NVME\\|NVMe/{N;N;d;}' dsu_output_utf8.xml"
+    args:
+      chdir: "/tmp"  # Specify the directory where dsu_output_utf8.xml is located
+
+  - name: Convert UTF-8 to UTF-16
+    command: "iconv -f UTF-8 -t UTF-16 dsu_output_utf8.xml -o dsu_output_utf16.xml"
+    args:
+      chdir: "/tmp"  # Specify the directory where dsu_output_utf8.xml is located
+
+  - name: Execute dsu with -n option
+    command: dsu --input-inventory-file=dsu_output_utf16.xml -n
+    args:
+      chdir: "/tmp"  # Specify the directory where dsu_output_utf16.xml is located
+    ignore_errors: true
+    register: dsu_output
+ 
+  - name: Update all packages
+    yum:
+      name: "*"
+      state: latest
+
+  - name: Retrieve package versions
+    package_facts:
+      manager: auto
+
+  - name: Retrieve latest kernel version available
+    set_fact:
+      latest_kernel_version: "{{ ansible_facts.packages['kernel-core'][0].version }}"
+
+  - name: Retrieve installed kernel version
+    shell:
+      cmd: uname -r | sed 's/-.*//'
+    register: installed_kernel_version
+
+  - name: Retrieve latest kernel release available
+    set_fact:
+      latest_kernel_release: "{{ ansible_facts.packages['kernel-core'][0].release }}"
+
+  - name: Retrieve installed kernel release
+    shell:
+      cmd: uname -r | sed 's/^[^-]*-//' | sed 's/\.[^.]*$//'
+    register: installed_kernel_release
+
+  - name: Reboot the node
+    reboot:
+      reboot_timeout: 3600  # Adjust this as needed; it's the time in seconds for how long to wait for the machine to reboot.
+    when: ("'No Applicable Update(s) Available' not in dsu_output.stdout") or
+          (latest_kernel_version != installed_kernel_version.stdout) or
+          (latest_kernel_release != installed_kernel_release.stdout)
+
+    #  post_tasks:
+    # Unset the noout flag after processing all the hosts
+    #  - name: Unset OSD noout
+    #  delegate_to: localhost
+    #  command: ceph osd unset noout
+    #  become: yes
+    #  run_once: true
+

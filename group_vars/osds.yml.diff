@@ -1,0 +1,20 @@
+--- osds.yml.oldsample	2020-11-05 08:19:06.391737288 +1100
++++ osds.yml	2020-11-04 13:59:00.317268355 +1100
+@@ -81,7 +81,7 @@
+ #
+ # Note: This scenario uses the ceph-disk tool to provision OSDs
+ 
+-#osd_scenario: dummy
++osd_scenario: lvm
+ #valid_osd_scenarios:
+ #  - collocated
+ #  - non-collocated
+@@ -219,7 +219,7 @@
+ #   - data: /dev/sda
+ #   - data: /dev/sdb1
+ 
+-#lvm_volumes: []
++lvm_volumes: []
+ #crush_device_class: ""
+ #osds_per_device: 1
+ 

@@ -1,0 +1,60 @@
+# This playbook performs a rolling restart on all 'osds' nodes.
+
+
+- name: Restart OSDS
+  hosts: osds
+  serial: 1
+  gather_facts: no
+  #ignore_errors: yes
+  ignore_unreachable: yes
+
+  pre_tasks:
+    # Set the noout flag at the beginning of the playbook
+    - name: Set OSD noout
+      delegate_to: localhost  # Assuming you're executing this on a node with ceph CLI access
+      command: ceph osd set noout
+      become: yes
+      run_once: true
+
+    - name: Set OSD norebalance
+      delegate_to: localhost  # Assuming you're executing this on a node with ceph CLI access
+      command: ceph osd set norebalance
+      become: yes
+      run_once: true
+
+  tasks:
+  - name: copy osd restart script
+    copy:
+     src: restart_osds.sh
+     dest: /tmp/restart_osds.sh
+     owner: root
+     group: root
+     mode: 0750
+  - name: restart ceph osds daemon(s)
+    command: /usr/bin/env bash /tmp/restart_osds.sh
+ 
+  - name: Wait until Ceph cluster has no OSDs down
+    delegate_to: localhost  # This is assumed to be executed on a node where `ceph` CLI is accessible
+    command: ceph health detail
+    register: ceph_health
+    until:
+      - "'down' not in ceph_health.stdout | lower"
+      - "'degraded' not in ceph_health.stdout | lower"
+      - "'error' not in ceph_health.stdout | lower"
+    retries: 100  # Adjust as needed, this will retry 30 times
+    delay: 30  # Wait 10 seconds between retries. Adjust as needed.
+    become: yes
+    changed_when: false
+
+  - name: Health check - Retreive Down OSDs
+    local_action:
+      module: shell
+      cmd: ceph status | grep 'osds down'
+    register: osd_status
+    failed_when: osd_status.rc != 1 and osd_status.rc != 0
+
+  - name: Health check - Exit if any osds are still down
+    fail:
+      msg: "OSDs are still down. Please troubleshoot."
+    when: osd_status.stdout != ""
+

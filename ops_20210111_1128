@@ -1,0 +1,1361 @@
+{
+    "ops": [
+        {
+            "description": "osd_alive(want up_thru 236681 have 236681)",
+            "initiated_at": "2021-01-10 20:06:36.056496",
+            "age": 55338.875590992997,
+            "duration": 55338.875622150998,
+            "type_data": {
+                "events": [
+                    {
+                        "time": "2021-01-10 20:06:36.056496",
+                        "event": "initiated"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056496",
+                        "event": "header_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056495",
+                        "event": "throttled"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056496",
+                        "event": "all_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056569",
+                        "event": "dispatched"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056569",
+                        "event": "mon:_ms_dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056570",
+                        "event": "mon:dispatch_op"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056570",
+                        "event": "psvc:dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056574",
+                        "event": "osdmap:preprocess_query"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056575",
+                        "event": "osdmap:preprocess_alive"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056576",
+                        "event": "forward_request_leader"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056585",
+                        "event": "forwarded"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:49.031420",
+                        "event": "resend forwarded message to leader"
+                    }
+                ],
+                "info": {
+                    "seq": 68894268,
+                    "src_is_mon": false,
+                    "source": "osd.128 v2:172.26.51.29:6800/2302506",
+                    "forwarded_to_leader": true
+                }
+            }
+        },
+        {
+            "description": "osd_alive(want up_thru 236682 have 236682)",
+            "initiated_at": "2021-01-10 20:06:36.056498",
+            "age": 55338.875588741001,
+            "duration": 55338.875690294,
+            "type_data": {
+                "events": [
+                    {
+                        "time": "2021-01-10 20:06:36.056498",
+                        "event": "initiated"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056498",
+                        "event": "header_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056497",
+                        "event": "throttled"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056498",
+                        "event": "all_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056585",
+                        "event": "dispatched"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056586",
+                        "event": "mon:_ms_dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056586",
+                        "event": "mon:dispatch_op"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056586",
+                        "event": "psvc:dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056590",
+                        "event": "osdmap:preprocess_query"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056590",
+                        "event": "osdmap:preprocess_alive"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056591",
+                        "event": "forward_request_leader"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056595",
+                        "event": "forwarded"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:49.031425",
+                        "event": "resend forwarded message to leader"
+                    }
+                ],
+                "info": {
+                    "seq": 68894269,
+                    "src_is_mon": false,
+                    "source": "osd.128 v2:172.26.51.29:6800/2302506",
+                    "forwarded_to_leader": true
+                }
+            }
+        },
+        {
+            "description": "osd_alive(want up_thru 236683 have 236683)",
+            "initiated_at": "2021-01-10 20:06:36.056500",
+            "age": 55338.875586552997,
+            "duration": 55338.875732114,
+            "type_data": {
+                "events": [
+                    {
+                        "time": "2021-01-10 20:06:36.056500",
+                        "event": "initiated"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056500",
+                        "event": "header_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056500",
+                        "event": "throttled"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056501",
+                        "event": "all_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056595",
+                        "event": "dispatched"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056596",
+                        "event": "mon:_ms_dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056596",
+                        "event": "mon:dispatch_op"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056596",
+                        "event": "psvc:dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056599",
+                        "event": "osdmap:preprocess_query"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056600",
+                        "event": "osdmap:preprocess_alive"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056600",
+                        "event": "forward_request_leader"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056604",
+                        "event": "forwarded"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:49.031428",
+                        "event": "resend forwarded message to leader"
+                    }
+                ],
+                "info": {
+                    "seq": 68894270,
+                    "src_is_mon": false,
+                    "source": "osd.128 v2:172.26.51.29:6800/2302506",
+                    "forwarded_to_leader": true
+                }
+            }
+        },
+        {
+            "description": "osd_alive(want up_thru 236684 have 236684)",
+            "initiated_at": "2021-01-10 20:06:36.056502",
+            "age": 55338.875584194,
+            "duration": 55338.875773148,
+            "type_data": {
+                "events": [
+                    {
+                        "time": "2021-01-10 20:06:36.056502",
+                        "event": "initiated"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056502",
+                        "event": "header_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056501",
+                        "event": "throttled"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056520",
+                        "event": "all_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056605",
+                        "event": "dispatched"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056605",
+                        "event": "mon:_ms_dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056605",
+                        "event": "mon:dispatch_op"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056605",
+                        "event": "psvc:dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056609",
+                        "event": "osdmap:preprocess_query"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056609",
+                        "event": "osdmap:preprocess_alive"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056610",
+                        "event": "forward_request_leader"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.056613",
+                        "event": "forwarded"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:49.031431",
+                        "event": "resend forwarded message to leader"
+                    }
+                ],
+                "info": {
+                    "seq": 68894271,
+                    "src_is_mon": false,
+                    "source": "osd.128 v2:172.26.51.29:6800/2302506",
+                    "forwarded_to_leader": true
+                }
+            }
+        },
+        {
+            "description": "osd_alive(want up_thru 236681 have 236681)",
+            "initiated_at": "2021-01-10 20:06:36.224141",
+            "age": 55338.707945292001,
+            "duration": 55338.708200613997,
+            "type_data": {
+                "events": [
+                    {
+                        "time": "2021-01-10 20:06:36.224141",
+                        "event": "initiated"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224141",
+                        "event": "header_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224139",
+                        "event": "throttled"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224143",
+                        "event": "all_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224235",
+                        "event": "dispatched"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224236",
+                        "event": "mon:_ms_dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224236",
+                        "event": "mon:dispatch_op"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224236",
+                        "event": "psvc:dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224240",
+                        "event": "osdmap:preprocess_query"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224240",
+                        "event": "osdmap:preprocess_alive"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224259",
+                        "event": "forward_request_leader"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224264",
+                        "event": "forwarded"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:49.031718",
+                        "event": "resend forwarded message to leader"
+                    }
+                ],
+                "info": {
+                    "seq": 68894527,
+                    "src_is_mon": false,
+                    "source": "osd.88 v2:172.26.51.26:6832/871275",
+                    "forwarded_to_leader": true
+                }
+            }
+        },
+        {
+            "description": "osd_alive(want up_thru 236682 have 236682)",
+            "initiated_at": "2021-01-10 20:06:36.224150",
+            "age": 55338.707936592997,
+            "duration": 55338.708250133001,
+            "type_data": {
+                "events": [
+                    {
+                        "time": "2021-01-10 20:06:36.224150",
+                        "event": "initiated"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224150",
+                        "event": "header_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224149",
+                        "event": "throttled"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224151",
+                        "event": "all_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224339",
+                        "event": "dispatched"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224340",
+                        "event": "mon:_ms_dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224340",
+                        "event": "mon:dispatch_op"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224341",
+                        "event": "psvc:dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224348",
+                        "event": "osdmap:preprocess_query"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224349",
+                        "event": "osdmap:preprocess_alive"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224351",
+                        "event": "forward_request_leader"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224360",
+                        "event": "forwarded"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:49.031723",
+                        "event": "resend forwarded message to leader"
+                    }
+                ],
+                "info": {
+                    "seq": 68894530,
+                    "src_is_mon": false,
+                    "source": "osd.88 v2:172.26.51.26:6832/871275",
+                    "forwarded_to_leader": true
+                }
+            }
+        },
+        {
+            "description": "osd_alive(want up_thru 236683 have 236683)",
+            "initiated_at": "2021-01-10 20:06:36.224156",
+            "age": 55338.707930723998,
+            "duration": 55338.708300787999,
+            "type_data": {
+                "events": [
+                    {
+                        "time": "2021-01-10 20:06:36.224156",
+                        "event": "initiated"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224156",
+                        "event": "header_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224155",
+                        "event": "throttled"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224157",
+                        "event": "all_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224404",
+                        "event": "dispatched"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224405",
+                        "event": "mon:_ms_dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224405",
+                        "event": "mon:dispatch_op"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224405",
+                        "event": "psvc:dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224412",
+                        "event": "osdmap:preprocess_query"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224413",
+                        "event": "osdmap:preprocess_alive"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224415",
+                        "event": "forward_request_leader"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224422",
+                        "event": "forwarded"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:49.031735",
+                        "event": "resend forwarded message to leader"
+                    }
+                ],
+                "info": {
+                    "seq": 68894533,
+                    "src_is_mon": false,
+                    "source": "osd.88 v2:172.26.51.26:6832/871275",
+                    "forwarded_to_leader": true
+                }
+            }
+        },
+        {
+            "description": "osd_alive(want up_thru 236684 have 236684)",
+            "initiated_at": "2021-01-10 20:06:36.224167",
+            "age": 55338.707919225999,
+            "duration": 55338.708330184003,
+            "type_data": {
+                "events": [
+                    {
+                        "time": "2021-01-10 20:06:36.224167",
+                        "event": "initiated"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224167",
+                        "event": "header_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224167",
+                        "event": "throttled"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224168",
+                        "event": "all_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224655",
+                        "event": "dispatched"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224656",
+                        "event": "mon:_ms_dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224656",
+                        "event": "mon:dispatch_op"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224656",
+                        "event": "psvc:dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224663",
+                        "event": "osdmap:preprocess_query"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224663",
+                        "event": "osdmap:preprocess_alive"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224664",
+                        "event": "forward_request_leader"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.224673",
+                        "event": "forwarded"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:49.031754",
+                        "event": "resend forwarded message to leader"
+                    }
+                ],
+                "info": {
+                    "seq": 68894543,
+                    "src_is_mon": false,
+                    "source": "osd.88 v2:172.26.51.26:6832/871275",
+                    "forwarded_to_leader": true
+                }
+            }
+        },
+        {
+            "description": "osd_alive(want up_thru 236681 have 236681)",
+            "initiated_at": "2021-01-10 20:06:36.240503",
+            "age": 55338.691583833999,
+            "duration": 55338.692033350002,
+            "type_data": {
+                "events": [
+                    {
+                        "time": "2021-01-10 20:06:36.240503",
+                        "event": "initiated"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240503",
+                        "event": "header_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240500",
+                        "event": "throttled"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240504",
+                        "event": "all_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240514",
+                        "event": "dispatched"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240517",
+                        "event": "mon:_ms_dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240518",
+                        "event": "mon:dispatch_op"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240519",
+                        "event": "psvc:dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240532",
+                        "event": "osdmap:preprocess_query"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240533",
+                        "event": "osdmap:preprocess_alive"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240537",
+                        "event": "forward_request_leader"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240550",
+                        "event": "forwarded"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:49.031836",
+                        "event": "resend forwarded message to leader"
+                    }
+                ],
+                "info": {
+                    "seq": 68894721,
+                    "src_is_mon": false,
+                    "source": "osd.137 v2:172.26.51.29:6836/2304116",
+                    "forwarded_to_leader": true
+                }
+            }
+        },
+        {
+            "description": "osd_alive(want up_thru 236682 have 236682)",
+            "initiated_at": "2021-01-10 20:06:36.240510",
+            "age": 55338.691576208999,
+            "duration": 55338.692064508003,
+            "type_data": {
+                "events": [
+                    {
+                        "time": "2021-01-10 20:06:36.240510",
+                        "event": "initiated"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240510",
+                        "event": "header_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240509",
+                        "event": "throttled"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240511",
+                        "event": "all_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240552",
+                        "event": "dispatched"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240553",
+                        "event": "mon:_ms_dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240553",
+                        "event": "mon:dispatch_op"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240553",
+                        "event": "psvc:dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240559",
+                        "event": "osdmap:preprocess_query"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240559",
+                        "event": "osdmap:preprocess_alive"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240561",
+                        "event": "forward_request_leader"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240564",
+                        "event": "forwarded"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:49.031840",
+                        "event": "resend forwarded message to leader"
+                    }
+                ],
+                "info": {
+                    "seq": 68894722,
+                    "src_is_mon": false,
+                    "source": "osd.137 v2:172.26.51.29:6836/2304116",
+                    "forwarded_to_leader": true
+                }
+            }
+        },
+        {
+            "description": "osd_alive(want up_thru 236683 have 236683)",
+            "initiated_at": "2021-01-10 20:06:36.240514",
+            "age": 55338.691572839001,
+            "duration": 55338.692099066997,
+            "type_data": {
+                "events": [
+                    {
+                        "time": "2021-01-10 20:06:36.240514",
+                        "event": "initiated"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240514",
+                        "event": "header_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240513",
+                        "event": "throttled"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240515",
+                        "event": "all_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240565",
+                        "event": "dispatched"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240566",
+                        "event": "mon:_ms_dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240566",
+                        "event": "mon:dispatch_op"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240566",
+                        "event": "psvc:dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240570",
+                        "event": "osdmap:preprocess_query"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240570",
+                        "event": "osdmap:preprocess_alive"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240571",
+                        "event": "forward_request_leader"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240574",
+                        "event": "forwarded"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:49.031846",
+                        "event": "resend forwarded message to leader"
+                    }
+                ],
+                "info": {
+                    "seq": 68894723,
+                    "src_is_mon": false,
+                    "source": "osd.137 v2:172.26.51.29:6836/2304116",
+                    "forwarded_to_leader": true
+                }
+            }
+        },
+        {
+            "description": "osd_alive(want up_thru 236684 have 236684)",
+            "initiated_at": "2021-01-10 20:06:36.240529",
+            "age": 55338.691557824,
+            "duration": 55338.692121330001,
+            "type_data": {
+                "events": [
+                    {
+                        "time": "2021-01-10 20:06:36.240529",
+                        "event": "initiated"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240529",
+                        "event": "header_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240528",
+                        "event": "throttled"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240530",
+                        "event": "all_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240633",
+                        "event": "dispatched"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240634",
+                        "event": "mon:_ms_dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240634",
+                        "event": "mon:dispatch_op"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240634",
+                        "event": "psvc:dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240639",
+                        "event": "osdmap:preprocess_query"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240639",
+                        "event": "osdmap:preprocess_alive"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240640",
+                        "event": "forward_request_leader"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.240647",
+                        "event": "forwarded"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:49.031849",
+                        "event": "resend forwarded message to leader"
+                    }
+                ],
+                "info": {
+                    "seq": 68894727,
+                    "src_is_mon": false,
+                    "source": "osd.137 v2:172.26.51.29:6836/2304116",
+                    "forwarded_to_leader": true
+                }
+            }
+        },
+        {
+            "description": "osd_alive(want up_thru 236685 have 236685)",
+            "initiated_at": "2021-01-10 20:06:36.407357",
+            "age": 55338.524729274002,
+            "duration": 55338.525330668002,
+            "type_data": {
+                "events": [
+                    {
+                        "time": "2021-01-10 20:06:36.407357",
+                        "event": "initiated"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.407357",
+                        "event": "header_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.407356",
+                        "event": "throttled"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.407358",
+                        "event": "all_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.407363",
+                        "event": "dispatched"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.407364",
+                        "event": "mon:_ms_dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.407364",
+                        "event": "mon:dispatch_op"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.407364",
+                        "event": "psvc:dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.407368",
+                        "event": "osdmap:preprocess_query"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.407368",
+                        "event": "osdmap:preprocess_alive"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.407370",
+                        "event": "forward_request_leader"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.407376",
+                        "event": "forwarded"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:49.032088",
+                        "event": "resend forwarded message to leader"
+                    }
+                ],
+                "info": {
+                    "seq": 68895834,
+                    "src_is_mon": false,
+                    "source": "osd.139 v2:172.26.51.29:6844/2304529",
+                    "forwarded_to_leader": true
+                }
+            }
+        },
+        {
+            "description": "osd_alive(want up_thru 236685 have 236685)",
+            "initiated_at": "2021-01-10 20:06:36.417257",
+            "age": 55338.514829703003,
+            "duration": 55338.515474966996,
+            "type_data": {
+                "events": [
+                    {
+                        "time": "2021-01-10 20:06:36.417257",
+                        "event": "initiated"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.417257",
+                        "event": "header_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.417254",
+                        "event": "throttled"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.417258",
+                        "event": "all_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.417264",
+                        "event": "dispatched"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.417265",
+                        "event": "mon:_ms_dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.417265",
+                        "event": "mon:dispatch_op"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.417265",
+                        "event": "psvc:dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.417269",
+                        "event": "osdmap:preprocess_query"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.417270",
+                        "event": "osdmap:preprocess_alive"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.417271",
+                        "event": "forward_request_leader"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.417276",
+                        "event": "forwarded"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:49.032174",
+                        "event": "resend forwarded message to leader"
+                    }
+                ],
+                "info": {
+                    "seq": 68896017,
+                    "src_is_mon": false,
+                    "source": "osd.88 v2:172.26.51.26:6832/871275",
+                    "forwarded_to_leader": true
+                }
+            }
+        },
+        {
+            "description": "osd_alive(want up_thru 236685 have 236685)",
+            "initiated_at": "2021-01-10 20:06:36.418256",
+            "age": 55338.513831092001,
+            "duration": 55338.514515002003,
+            "type_data": {
+                "events": [
+                    {
+                        "time": "2021-01-10 20:06:36.418256",
+                        "event": "initiated"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.418256",
+                        "event": "header_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.418254",
+                        "event": "throttled"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.418256",
+                        "event": "all_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.418261",
+                        "event": "dispatched"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.418262",
+                        "event": "mon:_ms_dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.418262",
+                        "event": "mon:dispatch_op"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.418262",
+                        "event": "psvc:dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.418266",
+                        "event": "osdmap:preprocess_query"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.418267",
+                        "event": "osdmap:preprocess_alive"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.418268",
+                        "event": "forward_request_leader"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.418274",
+                        "event": "forwarded"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:49.032182",
+                        "event": "resend forwarded message to leader"
+                    }
+                ],
+                "info": {
+                    "seq": 68896056,
+                    "src_is_mon": false,
+                    "source": "osd.11 v2:172.26.51.21:6812/2534424",
+                    "forwarded_to_leader": true
+                }
+            }
+        },
+        {
+            "description": "osd_alive(want up_thru 236685 have 236685)",
+            "initiated_at": "2021-01-10 20:06:36.422806",
+            "age": 55338.509280855003,
+            "duration": 55338.510003386,
+            "type_data": {
+                "events": [
+                    {
+                        "time": "2021-01-10 20:06:36.422806",
+                        "event": "initiated"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.422806",
+                        "event": "header_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.422804",
+                        "event": "throttled"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.422807",
+                        "event": "all_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.422811",
+                        "event": "dispatched"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.422812",
+                        "event": "mon:_ms_dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.422812",
+                        "event": "mon:dispatch_op"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.422812",
+                        "event": "psvc:dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.422816",
+                        "event": "osdmap:preprocess_query"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.422817",
+                        "event": "osdmap:preprocess_alive"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.422818",
+                        "event": "forward_request_leader"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.422824",
+                        "event": "forwarded"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:49.032229",
+                        "event": "resend forwarded message to leader"
+                    }
+                ],
+                "info": {
+                    "seq": 68896182,
+                    "src_is_mon": false,
+                    "source": "osd.2 v2:172.26.51.21:6832/2535361",
+                    "forwarded_to_leader": true
+                }
+            }
+        },
+        {
+            "description": "osd_alive(want up_thru 236685 have 236685)",
+            "initiated_at": "2021-01-10 20:06:36.433366",
+            "age": 55338.498720652002,
+            "duration": 55338.499481266001,
+            "type_data": {
+                "events": [
+                    {
+                        "time": "2021-01-10 20:06:36.433366",
+                        "event": "initiated"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.433366",
+                        "event": "header_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.433363",
+                        "event": "throttled"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.433398",
+                        "event": "all_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.433410",
+                        "event": "dispatched"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.433414",
+                        "event": "mon:_ms_dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.433414",
+                        "event": "mon:dispatch_op"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.433418",
+                        "event": "psvc:dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.433429",
+                        "event": "osdmap:preprocess_query"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.433430",
+                        "event": "osdmap:preprocess_alive"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.433433",
+                        "event": "forward_request_leader"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.433444",
+                        "event": "forwarded"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:49.032345",
+                        "event": "resend forwarded message to leader"
+                    }
+                ],
+                "info": {
+                    "seq": 68896393,
+                    "src_is_mon": false,
+                    "source": "osd.128 v2:172.26.51.29:6800/2302506",
+                    "forwarded_to_leader": true
+                }
+            }
+        },
+        {
+            "description": "osd_alive(want up_thru 236685 have 236685)",
+            "initiated_at": "2021-01-10 20:06:36.453824",
+            "age": 55338.478262752004,
+            "duration": 55338.479061245998,
+            "type_data": {
+                "events": [
+                    {
+                        "time": "2021-01-10 20:06:36.453824",
+                        "event": "initiated"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.453824",
+                        "event": "header_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.453822",
+                        "event": "throttled"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.453825",
+                        "event": "all_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.454691",
+                        "event": "dispatched"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.454692",
+                        "event": "mon:_ms_dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.454692",
+                        "event": "mon:dispatch_op"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.454692",
+                        "event": "psvc:dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.454696",
+                        "event": "osdmap:preprocess_query"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.454696",
+                        "event": "osdmap:preprocess_alive"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.454698",
+                        "event": "forward_request_leader"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.454704",
+                        "event": "forwarded"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:49.032677",
+                        "event": "resend forwarded message to leader"
+                    }
+                ],
+                "info": {
+                    "seq": 68897051,
+                    "src_is_mon": false,
+                    "source": "osd.989 v2:172.26.51.59:6884/3973980",
+                    "forwarded_to_leader": true
+                }
+            }
+        },
+        {
+            "description": "osd_alive(want up_thru 236685 have 236685)",
+            "initiated_at": "2021-01-10 20:06:36.468122",
+            "age": 55338.463964923001,
+            "duration": 55338.464801364004,
+            "type_data": {
+                "events": [
+                    {
+                        "time": "2021-01-10 20:06:36.468122",
+                        "event": "initiated"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.468122",
+                        "event": "header_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.468119",
+                        "event": "throttled"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.468123",
+                        "event": "all_read"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.468750",
+                        "event": "dispatched"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.468750",
+                        "event": "mon:_ms_dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.468751",
+                        "event": "mon:dispatch_op"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.468751",
+                        "event": "psvc:dispatch"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.468754",
+                        "event": "osdmap:preprocess_query"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.468755",
+                        "event": "osdmap:preprocess_alive"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.468756",
+                        "event": "forward_request_leader"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:36.468763",
+                        "event": "forwarded"
+                    },
+                    {
+                        "time": "2021-01-10 20:06:49.032860",
+                        "event": "resend forwarded message to leader"
+                    }
+                ],
+                "info": {
+                    "seq": 68898173,
+                    "src_is_mon": false,
+                    "source": "osd.918 v2:172.26.51.57:6856/3888189",
+                    "forwarded_to_leader": true
+                }
+            }
+        },
+        {
+            "description": "log(1 entries from seq 3870469 at 2021-01-11 11:28:54.512755)",
+            "initiated_at": "2021-01-11 11:28:54.512764",
+            "age": 0.41932304500000001,
+            "duration": 0.42020157699999999,
+            "type_data": {
+                "events": [
+                    {
+                        "time": "2021-01-11 11:28:54.512764",
+                        "event": "initiated"
+                    },
+                    {
+                        "time": "2021-01-11 11:28:54.512764",
+                        "event": "header_read"
+                    },
+                    {
+                        "time": "0.000000",
+                        "event": "throttled"
+                    },
+                    {
+                        "time": "0.000000",
+                        "event": "all_read"
+                    },
+                    {
+                        "time": "2021-01-11 11:28:54.522037",
+                        "event": "dispatched"
+                    },
+                    {
+                        "time": "2021-01-11 11:28:54.522037",
+                        "event": "mon:_ms_dispatch"
+                    },
+                    {
+                        "time": "2021-01-11 11:28:54.522038",
+                        "event": "mon:dispatch_op"
+                    },
+                    {
+                        "time": "2021-01-11 11:28:54.522038",
+                        "event": "psvc:dispatch"
+                    },
+                    {
+                        "time": "2021-01-11 11:28:54.522043",
+                        "event": "logm:preprocess_query"
+                    },
+                    {
+                        "time": "2021-01-11 11:28:54.522044",
+                        "event": "logm:preprocess_log"
+                    },
+                    {
+                        "time": "2021-01-11 11:28:54.522045",
+                        "event": "forward_request_leader"
+                    },
+                    {
+                        "time": "2021-01-11 11:28:54.522052",
+                        "event": "forwarded"
+                    }
+                ],
+                "info": {
+                    "seq": 70165617,
+                    "src_is_mon": true,
+                    "source": "mon.2 v2:172.26.51.7:3300/0",
+                    "forwarded_to_leader": true
+                }
+            }
+        }
+    ],
+    "num_ops": 20
+}

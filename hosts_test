@@ -1,0 +1,5 @@
+[clients]
+localhost copy_admin_key=true
+
+[osds]
+mfx32-ceph1-np
