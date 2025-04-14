@@ -84,6 +84,32 @@
     - not switch_to_containers | default(False) | bool
     - inventory_hostname == ansible_play_hosts_all | last
 
+- name: RHEL9 UPGRADE - reboot to get lvm partitions back up 
+  reboot:
+  when: rhel9_upgrade is defined and rhel9_upgrade | bool 
+
+# - name: RHEL9 UPGRADE - Wait for node to come back up
+#   wait_for:
+#     host: "{{ inventory_hostname }}"
+#     port: 22
+#     delay: 5  # Wait 5 seconds before starting the check
+#     timeout: 100000  # Maximum time to wait (in seconds)
+#     state: started
+#   delegate_to: localhost
+#   when: rhel9_upgrade is defined and rhel9_upgrade | bool
+
+# - name: RHEL9 UPGRADE - activate all osds 
+#   command: ceph-volume lvm activate --all
+#   register: command_output
+#   retries: 10
+#   until: "'activate successful' not in command_output.stdout"
+#   when: rhel9_upgrade is defined and rhel9_upgrade | bool 
+
+# - name: RHEL9 UPGRADE - activate all osds 
+#   shell: 
+#     cmd: ceph-volume lvm activate --all 
+#   when: rhel9_upgrade is defined and rhel9_upgrade | bool 
+
 - name: wait for all osd to be up
   command: "{{ hostvars[groups[mon_group_name][0]]['container_exec_cmd'] | default('') }} ceph --cluster {{ cluster }} osd stat -f json"
   register: wait_for_all_osds_up
