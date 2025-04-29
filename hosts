@@ -12,15 +12,23 @@ mon2a-ceph1-np
 mon1a-ceph1-np
 
 [osds]
-mfx31-ceph1-np
-mfx[34:36]-ceph1-np
 mfx[46:86]-ceph1-np
-mfx[37:41]-ceph1-np
+mfx41-ceph1-np
 mfx[93:98]-ceph1-np
 mfx[99:107]-ceph1-np
 mfx[1:11]-ceph1-np
 mfx[12:16]-ceph1-np
 mfx[17:19]-ceph1-np
+
+[remove]
+mfx31-ceph1-np
+mfx34-ceph1-np
+mfx35-ceph1-np
+mfx36-ceph1-np
+mfx37-ceph1-np
+mfx38-ceph1-np
+mfx39-ceph1-np
+mfx40-ceph1-np
 
 [upgradeosds]
 mfx41-ceph1-np
