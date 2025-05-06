@@ -154,11 +154,11 @@
       run_once: true
       delegate_to: "{{ groups[mon_group_name][0] }}"
       block:
-        - name: Get pool list
-          ansible.builtin.command: "{{ ceph_cmd }} --cluster {{ cluster }} osd pool ls detail -f json"
-          register: pool_list
-          changed_when: false
-          check_mode: false
+        #- name: Get pool list
+        #  ansible.builtin.shell: "{{ ceph_cmd }} --cluster {{ cluster }} osd pool ls detail -f json | jq -Mc"
+        #  register: pool_list
+        #  changed_when: false
+        #  check_mode: false
 
         - name: Get balancer module status
           ansible.builtin.command: "{{ ceph_cmd }} --cluster {{ cluster }} balancer status -f json"
@@ -167,10 +167,10 @@
           changed_when: false
           check_mode: false
 
-        - name: Set_fact pools_pgautoscaler_mode
-          ansible.builtin.set_fact:
-            pools_pgautoscaler_mode: "{{ pools_pgautoscaler_mode | default([]) | union([{'name': item.pool_name, 'mode': item.pg_autoscale_mode}]) }}"
-          with_items: "{{ pool_list.stdout | default('{}') | from_json }}"
+        # - name: Set_fact pools_pgautoscaler_mode
+        #  ansible.builtin.set_fact:
+        #    pools_pgautoscaler_mode: "{{ pools_pgautoscaler_mode | default([]) | union([{'name': item.pool_name, 'mode': item.pg_autoscale_mode}]) }}"
+        #  with_items: "{{ pool_list.stdout | default('{}') | from_json }}"
 
         - name: Disable balancer
           ansible.builtin.command: "{{ ceph_cmd }} --cluster {{ cluster }} balancer off"
@@ -284,9 +284,13 @@
       ansible.builtin.command: "{{ container_exec_cmd_update_osd | default('') }} ceph --cluster {{ cluster }} pg stat --format json"
       register: ceph_health_post
       until: >
-        (((ceph_health_post.stdout | from_json).pg_summary.num_pg_by_state | length) > 0)
-        and
-        (((ceph_health_post.stdout | from_json).pg_summary.num_pg_by_state | selectattr('name', 'search', '^active\\+clean') | map(attribute='num') | list | sum) == (ceph_health_post.stdout | from_json).pg_summary.num_pgs)
+             (((ceph_health_post.stdout | from_json).pg_summary.num_pg_by_state | length) > 0)
+             and
+             (((ceph_health_post.stdout | from_json).pg_summary.num_pg_by_state | selectattr('name', 'search', '^(active\\+clean|active\\+remapped\\+backfilling|active\\+backfilling)') | map(attribute='num') | list | sum) == (ceph_health_post.stdout | from_json).pg_summary.num_pgs)
+#  until: >
+#        (((ceph_health_post.stdout | from_json).pg_summary.num_pg_by_state | length) > 0)
+#        and
+#        (((ceph_health_post.stdout | from_json).pg_summary.num_pg_by_state | selectattr('name', 'search', '^active\\+clean') | map(attribute='num') | list | sum) == (ceph_health_post.stdout | from_json).pg_summary.num_pgs)
       delegate_to: "{{ groups[mon_group_name][0] }}"
       changed_when: false
       retries: "{{ health_osd_check_retries }}"
