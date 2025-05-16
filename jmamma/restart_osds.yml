@@ -1,6 +1,6 @@
 
 - name: Restart OSDS
-  hosts: osds flash
+  hosts: draining
   serial: 1
   gather_facts: no
   ignore_errors: yes

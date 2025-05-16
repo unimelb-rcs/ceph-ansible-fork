@@ -1,0 +1,48 @@
+
+- name: Perform restart of osds on each host.
+  hosts: restartosds
+  serial: 1  # Ensures one host is processed at a time
+  gather_facts: no
+
+  pre_tasks:
+    # Set the noout flag at the beginning of the playbook
+    - name: Set OSD noout
+      delegate_to: localhost  # Assuming you're executing this on a node with ceph CLI access
+      command: ceph osd set noout
+      become: yes
+      run_once: true
+
+  tasks:
+  - name: Wait until Ceph cluster is healthy with no OSDs down
+    delegate_to: localhost  # This is assumed to be executed on a node where `ceph` CLI is accessible
+    command: ceph health detail
+    register: ceph_health
+    #until: "'HEALTH_OK' in ceph_health.stdout and 'down' not in ceph_health.stdout"
+    until: 
+      - "'down' not in ceph_health.stdout | lower"
+      - "'degraded' not in ceph_health.stdout | lower"
+      - "'error' not in ceph_health.stdout | lower"
+    retries: 100  # Adjust as needed, this will retry 30 times
+    delay: 30  # Wait 10 seconds between retries. Adjust as needed.
+    become: yes
+    changed_when: false
+
+  - name: Stop all OSDs on the current host
+    command: systemctl stop ceph-osd@*.service
+    become: yes
+
+  - name: Pause for a few seconds to ensure OSDs are stopped
+    pause:
+      seconds: 20
+
+  - name: Ceph volume activate (for good measure)
+    command: ceph-volume lvm activate --all
+    become: yes
+
+    #  post_tasks:
+    # Unset the noout flag after processing all the hosts
+    #  - name: Unset OSD noout
+    #  delegate_to: localhost
+    #  command: ceph osd unset noout
+    #  become: yes
+    #  run_once: true

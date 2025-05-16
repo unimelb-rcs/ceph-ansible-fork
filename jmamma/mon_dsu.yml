@@ -1,0 +1,106 @@
+---
+
+- name: Perform full system update on osd nodes
+  hosts: dsumons
+  serial: 1  # Ensures one host is processed at a time
+  gather_facts: no
+
+  tasks:
+  - name: copy dsu bootstrap
+    copy:
+     src: bootstrap.sh
+     dest: /tmp/bootstrap.sh
+     owner: root
+     group: root
+     mode: 0750
+
+  - name: run dsu bootstrap
+    shell: /usr/bin/env bash /tmp/bootstrap.sh
+    become: yes
+
+  - name: Install dell-system-update
+    yum:
+      name: dell-system-update
+      state: present
+    become: yes
+ 
+  - name: Remove output file
+    command: rm -f 'dsu_output.xml'
+    args:
+      chdir: "/tmp"  # Specify the directory where you want to store the inventory XML file
+
+  - name: Generate inventory XML file
+    command: dsu --output-inventory-xml=dsu_output.xml
+    args:
+      chdir: "/tmp"  # Specify the directory where you want to store the inventory XML file
+
+  - name: Convert UTF-16 to UTF-8
+    command: "iconv -f UTF-16 -t UTF-8 dsu_output.xml -o dsu_output_utf8.xml"
+    args:
+      chdir: "/tmp"  # Specify the directory where dsu_output.xml is located
+
+  - name: Remove lines containing 'NVME' or 'NVMe' along with the following two lines
+    command: "sed -i '/NVME\\|NVMe/{N;N;d;}' dsu_output_utf8.xml"
+    args:
+      chdir: "/tmp"  # Specify the directory where dsu_output_utf8.xml is located
+
+  - name: Convert UTF-8 to UTF-16
+    command: "iconv -f UTF-8 -t UTF-16 dsu_output_utf8.xml -o dsu_output_utf16.xml"
+    args:
+      chdir: "/tmp"  # Specify the directory where dsu_output_utf8.xml is located
+
+  - name: Wait until Ceph cluster is healthy with no OSDs down
+    delegate_to: localhost  # This is assumed to be executed on a node where `ceph` CLI is accessible
+    command: ceph health detail
+    register: ceph_health
+    #until: "'HEALTH_OK' in ceph_health.stdout and 'down' not in ceph_health.stdout"
+    until: 
+      - "'down' not in ceph_health.stdout | lower"
+      - "'degraded' not in ceph_health.stdout | lower"
+      - "'error' not in ceph_health.stdout | lower"
+    retries: 100  # Adjust as needed, this will retry 30 times
+    delay: 30  # Wait 10 seconds between retries. Adjust as needed.
+    become: yes
+    changed_when: false
+
+  - name: Stop all MONs on the current host
+    command: systemctl stop ceph-mon@*.service
+    become: yes
+
+  - name: Pause for a few seconds to ensure OSDs are stopped
+    pause:
+      seconds: 20
+
+  - name: Check the status of all Ceph MON services
+    command: systemctl is-active ceph-mon@*.service
+    register: mon_status
+    become: yes
+    changed_when: false
+    failed_when: mon_status.rc == 0
+
+  - name: Fail if any Ceph MON service is still running
+    fail:
+      msg: "Some Ceph OSD services are still running!"
+    when: "'active' in mon_status.stdout"
+
+  - name: Execute dsu with -n option
+    command: dsu --input-inventory-file=dsu_output_utf16.xml -n
+    args:
+      chdir: "/tmp"  # Specify the directory where dsu_output_utf16.xml is located
+    ignore_errors: true
+    register: dsu_output
+ 
+  - name: Reboot the node
+    reboot:
+      reboot_timeout: 3600  # Adjust this as needed; it's the time in seconds for how long to wait for the machine to reboot.
+    when: "'No Applicable Update(s) Available' not in dsu_output.stdout"
+    become: yes
+
+    #  post_tasks:
+    # Unset the noout flag after processing all the hosts
+    #  - name: Unset OSD noout
+    #  delegate_to: localhost
+    #  command: ceph osd unset noout
+    #  become: yes
+    #  run_once: true
+

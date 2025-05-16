@@ -1,0 +1,95 @@
+#This playbook manually updates the hard drive firmware for Toshiba MG07 Drives to version EIOD
+# dsu (Dell System Update) does not update the HDD firmware due to a bug.
+# See:
+# https://www.dell.com/support/kbdoc/en-us/000191163/mg06-and-mg07-drives-stop-responding-and-go-offline-until-a-server-reboot 
+# https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=nffhm&oscode=rhel8&productcode=poweredge-r740xd2 
+
+---
+
+- name: Update Toshiba MG07 Drive Firmware to EIOD
+  hosts: dsuosds
+  serial: 1  # Ensures one host is processed at a time
+  gather_facts: no
+
+  pre_tasks:
+    - name: Retreive HDD Models
+      shell:
+        cmd: lsblk -o MODEL | grep -e "MG07SCA12TEY" -e "MG07SCA14TEY" -e "MG07SCA12TAY"
+      register: hdd_info
+
+    - name: Exit if HDD Model MG07SCA12TEY,MG07SCA14TEY,MG07SCA12TAY does not exist
+      fail:
+        msg: "HDD Model MG07SCA12TEY,MG07SCA14TEY,MG07SCA12TAY not present on server"
+      when: hdd_info.stdout != ""
+
+    # Set the noout flag at the beginning of the playbook
+    - name: Set OSD noout
+      delegate_to: localhost  # Assuming you're executing this on a node with ceph CLI access
+      command: ceph osd set noout
+      become: yes
+      run_once: true
+
+  tasks:
+  - name: Wait until Ceph cluster is healthy with no OSDs down
+    delegate_to: localhost  # This is assumed to be executed on a node where `ceph` CLI is accessible
+    command: ceph health detail
+    register: ceph_health
+    #until: "'HEALTH_OK' in ceph_health.stdout and 'down' not in ceph_health.stdout"
+    until: 
+      - "'down' not in ceph_health.stdout | lower"
+      - "'degraded' not in ceph_health.stdout | lower"
+      - "'error' not in ceph_health.stdout | lower"
+    retries: 100  # Adjust as needed, this will retry 30 times
+    delay: 30  # Wait 10 seconds between retries. Adjust as needed.
+    become: yes
+    changed_when: false
+
+  - name: Stop all OSDs on the current host
+    command: systemctl stop ceph-osd@*.service
+    become: yes
+
+  - name: Pause for a few seconds to ensure OSDs are stopped
+    pause:
+      seconds: 20
+
+  - name: Check the status of all Ceph OSD services
+    command: systemctl is-active ceph-osd@*.service
+    register: osd_status
+    become: yes
+    changed_when: false
+    failed_when: osd_status.rc == 0
+
+  - name: Fail if any Ceph OSD service is still running
+    fail:
+      msg: "Some Ceph OSD services are still running!"
+    when: "'active' in osd_status.stdout"
+
+  - name: copy firmware update
+    copy:
+     src: SAS-Drive_Firmware_NFFHM_LN64_EI0D_A00_02.BIN
+     dest: /tmp/SAS-Drive_Firmware_NFFHM_LN64_EI0D_A00_02.BIN
+     owner: root
+     group: root
+     mode: 0750
+
+  - name: run firmware update
+    shell: /tmp/SAS-Drive_Firmware_NFFHM_LN64_EI0D_A00_02.BIN -q
+    become: yes
+
+
+  - name: Reboot the node
+    reboot:
+      reboot_timeout: 3600  # Adjust this as needed; it's the time in seconds for how long to wait for the machine to reboot.
+
+  - name: Ceph volume activate (for good measure)
+    command: ceph-volume lvm activate --all
+    become: yes
+
+
+    # Unset the noout flag after processing all the hosts
+    #  - name: Unset OSD noout
+    #  delegate_to: localhost
+    #  command: ceph osd unset noout
+    #  become: yes
+    #  run_once: true
+
