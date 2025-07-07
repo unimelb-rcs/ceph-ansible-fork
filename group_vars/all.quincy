@@ -156,8 +156,8 @@ ceph_repository: community
 # Enabled when ceph_repository == 'community'
 #
 
-ceph_mirror: http://build.melbourne.nectar.org.au/ceph/
-ceph_stable_key: http://build.melbourne.nectar.org.au/ceph/keys/release.asc
+ceph_mirror: http://build2023.cloud.unimelb.edu.au/ceph/
+ceph_stable_key: http://build2023.cloud.unimelb.edu.au/ceph/keys/release.asc
 ceph_stable_release: quincy
 ceph_stable_repo: "{{ ceph_mirror }}/rpm-{{ ceph_stable_release }}"
 

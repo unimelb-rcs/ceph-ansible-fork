@@ -15,11 +15,16 @@ stg[8:15]-ceph1-qh2
 [upgradeosds]
 stg[67:68]-ceph1-qh2
 
+[hddosds]
+stg[42:68]-ceph1-qh2
+stg[8:15]-ceph1-qh2
+
 [flashosds]
 flash[1:10]-ceph1-qh2
 
 [restartosds]
-flash[9:10]-ceph1-qh2
+stg[46:68]-ceph1-qh2
+stg[9:15]-ceph1-qh2
 
 [newosds]
 stg[8:15]-ceph1-qh2

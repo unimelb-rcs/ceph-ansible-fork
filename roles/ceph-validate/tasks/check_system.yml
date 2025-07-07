@@ -6,9 +6,10 @@
 
 - name: fail on unsupported ansible version
   fail:
-    msg: "Ansible version must be 2.12!"
-  when: ansible_version.minor|int != 12
-
+    msg: "Ansible version must be 2.12 or higher!"
+      #  when: ansible_version.minor|int != 12
+  when: ansible_version.full is version('2.12', '<')
+    
 - name: fail on unsupported system
   fail:
     msg: "System not supported {{ ansible_facts['system'] }}"

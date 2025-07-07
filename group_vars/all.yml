@@ -156,8 +156,8 @@ ceph_repository: community
 # Enabled when ceph_repository == 'community'
 #
 
-ceph_mirror: http://build.melbourne.nectar.org.au/ceph/
-ceph_stable_key: http://build.melbourne.nectar.org.au/ceph/keys/release.asc
+ceph_mirror: http://build2023.cloud.unimelb.edu.au/ceph/
+ceph_stable_key: http://build2023.cloud.unimelb.edu.au/ceph/keys/release.asc
 ceph_stable_release: quincy
 ceph_stable_repo: "{{ ceph_mirror }}/rpm-{{ ceph_stable_release }}"
 
@@ -571,7 +571,7 @@ ceph_conf_overrides:
     osd_recovery_op_priority: 1
     osd_client_op_priority: 63
     osd_scrub_auto_repair: true
-
+    #    osd_op_queue: wpq # For spinning disk only, remove for flash nodes or find a better way to do this in ansible.
   mon:
     mon_data_size_warn: 21474836480
 
