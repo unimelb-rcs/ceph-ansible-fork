@@ -364,8 +364,8 @@ monitor_interface: bond0.3030
 cephfs: mf1fs
 cephfs_data_pool:
   name: 'mf1fs_data'
-  pg_num: 16384
-  pgp_num: 16384
+  pg_num: 32768
+  pgp_num: 32768
   rule_name: "mf1fs_data"
   type: 3
   erasure_profile: "mf1-ec-63"
@@ -395,8 +395,6 @@ cephfs_metadata_pool:
 #hci_safety_factor: 0.2
 #non_hci_safety_factor: 0.7
 #safety_factor: "{{ hci_safety_factor if is_hci | bool else non_hci_safety_factor }}"
-#osd_memory_target: 4294967296
-osd_memory_target: 7554507735
 #journal_size: 5120 # OSD journal size in MB
 #block_db_size: -1 # block db size in bytes for the ceph-volume lvm batch. -1 means use the default of 'as big as possible'.
 #public_network: 0.0.0.0/0
@@ -407,7 +405,6 @@ cluster_network: "172.26.4.0/24"
 #osd_mkfs_options_xfs: -f -i size=2048
 #osd_mount_options_xfs: noatime,largeio,inode64,swalloc
 #osd_objectstore: bluestore
-osd_op_queue: "wpq"
 
 # Any device containing these patterns in their path will be excluded.
 #osd_auto_discovery_exclude: "dm-*|loop*|md*|rbd*"
@@ -607,6 +604,7 @@ ceph_conf_overrides:
   osd:
     #bluestore_cache_size: 2147483648
     #bluestore_prefer_deferred_size: 32768000
+    osd_memory_target: 7554566455 #Added by wx 22/05/2025
     bluefs_buffered_io: true
     osd_class_update_on_start: false
     osd_deep_scrub_interval: 2419200
@@ -616,6 +614,8 @@ ceph_conf_overrides:
     osd_recovery_sleep_hybrid: 0
     osd_max_backfills: 2
     osd_scrub_auto_repair: true
+    osd_op_queue: wpq
+    osd_max_scrubs: 2
   mds:
     mds_cache_memory_limit: 159104409600
     mds_client_prealloc_inos: 20000
