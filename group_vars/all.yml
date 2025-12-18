@@ -615,7 +615,7 @@ ceph_conf_overrides:
     osd_max_backfills: 2
     osd_scrub_auto_repair: true
     osd_op_queue: wpq
-    osd_max_scrubs: 2
+    osd_max_scrubs: 1
   mds:
     mds_cache_memory_limit: 159104409600
     mds_client_prealloc_inos: 20000
