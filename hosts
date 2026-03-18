@@ -1,29 +1,27 @@
 [mons]
 mon[1:3]a-test-ceph1
-#mon4-test-ceph1 Removed as per RCS-1418
 
 [osds]
-stg[1:8]-test-ceph1
+stg[9:17]-test-ceph1
 flash[1:7]-test-ceph1
 
 [flashosds]
 flash[1:7]-test-ceph1
 
 [mdss]
-mds1a-test-ceph1
-mds2a-test-ceph1
+mds[1:2]a-test-ceph1
 
 [rgws]
 rgw[1:2]-test-ceph1
 
+[mgrs]
+mon[1:3]a-test-ceph1
+
 [newosds]
-stg[1:8]-test-ceph1
+flash[1:3]-test-ceph1
 
 [restartosds]
-stg[1:2]-test-ceph1
 
 [rhel9_upgrades]
-mon1a-test-ceph1
 
 [puppet_agents]
-#stg[7:8]-test-ceph1.mgmt.storage.unimelb.edu.au
