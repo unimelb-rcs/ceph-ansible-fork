@@ -15,8 +15,7 @@ mds2a-test-ceph3
 rgw1a-test-ceph3
 
 [osds]
-stg[14:22]-test-ceph3
-stg[25:32]-test-ceph3
+stg[1:15]-test-ceph3
 
 [dsuosds-parallel]
 
@@ -25,7 +24,7 @@ stg[25:32]-test-ceph3
 [fix_host]
 
 [newosds]
-stg[31:32]-test-ceph3
+stg[11:15]-test-ceph3
 
 [puppet_agents]
 #stg[18:19]-test-ceph3.mgmt.storage.unimelb.edu.au

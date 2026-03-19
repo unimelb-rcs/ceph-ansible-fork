@@ -8,24 +8,27 @@
 #
 #
 # If you run a Ceph community version, you have to change the variable: ceph_stable_release to the new release
+#
+# If you run Red Hat Ceph Storage and are doing a **major** update (e.g: from 2 to 3), you have to change the ceph_rhcs_version to a newer one
+#
 
-- name: Confirm whether user really meant to upgrade the cluster
+- name: confirm whether user really meant to upgrade the cluster
   hosts: localhost
   tags: always
   become: false
   gather_facts: false
   vars:
-    mgr_group_name: mgrs
+    - mgr_group_name: mgrs
 
   vars_prompt:
-    - name: ireallymeanit  # noqa: name[casing]
+    - name: ireallymeanit
       prompt: Are you sure you want to upgrade the cluster?
       default: 'no'
-      private: false
+      private: no
 
   tasks:
-    - name: Exit playbook, if user did not mean to upgrade cluster
-      ansible.builtin.fail:
+    - name: exit playbook, if user did not mean to upgrade cluster
+      fail:
         msg: >
           "Exiting rolling_update.yml playbook, cluster was NOT upgraded.
            To upgrade the cluster, either say 'yes' on the prompt or
@@ -33,12 +36,18 @@
            invoking the playbook"
       when: ireallymeanit != 'yes'
 
-    - name: Import_role ceph-defaults
-      ansible.builtin.import_role:
+    - name: import_role ceph-defaults
+      import_role:
         name: ceph-defaults
 
+    - name: check if a legacy grafana-server group exists
+      import_role:
+        name: ceph-facts
+        tasks_from: convert_grafana_server_group_name.yml
+      when: groups.get((grafana_server_group_name | default('grafana-server')), []) | length > 0
 
-- name: Gather facts and check the init system
+
+- name: gather facts and check the init system
   hosts:
     - "{{ mon_group_name|default('mons') }}"
     - "{{ osd_group_name|default('osds') }}"
@@ -48,68 +57,61 @@
     - "{{ rbdmirror_group_name|default('rbdmirrors') }}"
     - "{{ nfs_group_name|default('nfss') }}"
     - "{{ client_group_name|default('clients') }}"
+    - "{{ iscsi_gw_group_name|default('iscsigws') }}"
     - "{{ monitoring_group_name|default('monitoring') }}"
   tags: always
-  any_errors_fatal: true
-  become: true
-  gather_facts: false
+  any_errors_fatal: True
+  become: True
+  gather_facts: False
   vars:
-    delegate_facts_host: true
+    delegate_facts_host: True
   tasks:
-    - name: Gather facts on all Ceph hosts for following reference
-      ansible.builtin.debug:
-        msg: "gather facts on all Ceph hosts for following reference"
+    - debug: msg="gather facts on all Ceph hosts for following reference"
 
-    - name: Import ceph-defaults role
-      ansible.builtin.import_role:
+    - import_role:
         name: ceph-defaults
 
-    - name: Gather facts
-      ansible.builtin.setup:
+    - name: gather facts
+      setup:
         gather_subset:
           - 'all'
           - '!facter'
           - '!ohai'
       when: not delegate_facts_host | bool or inventory_hostname in groups.get(client_group_name, [])
 
-    - name: Gather and delegate facts
-      ansible.builtin.setup:
+    - name: gather and delegate facts
+      setup:
         gather_subset:
           - 'all'
           - '!facter'
           - '!ohai'
       delegate_to: "{{ item }}"
-      delegate_facts: true
+      delegate_facts: True
       with_items: "{{ groups['all'] | difference(groups.get('clients', [])) }}"
       run_once: true
       when: delegate_facts_host | bool
 
-    - name: Set_fact rolling_update
-      ansible.builtin.set_fact:
+    - name: set_fact rolling_update
+      set_fact:
         rolling_update: true
 
-    - name: Import ceph-facts role
-      ansible.builtin.import_role:
+    - import_role:
         name: ceph-facts
 
-    - name: Import ceph-infra role
-      ansible.builtin.import_role:
+    - import_role:
         name: ceph-infra
       tags: ceph_infra
 
-    - name: Import ceph-validate role
-      ansible.builtin.import_role:
+    - import_role:
         name: ceph-validate
 
-    - name: Import ceph-container-engine role
-      ansible.builtin.import_role:
+    - import_role:
         name: ceph-container-engine
       when:
         - (group_names != ['clients']) or (inventory_hostname == groups.get('clients', [''])|first)
         - (containerized_deployment | bool) or (dashboard_enabled | bool)
 
-    - name: Import ceph-container-common role
-      ansible.builtin.import_role:
+    - import_role:
         name: ceph-container-common
         tasks_from: registry
       when:
@@ -117,98 +119,90 @@
         - (containerized_deployment | bool) or (dashboard_enabled | bool)
         - ceph_docker_registry_auth | bool
 
-    - name: Check ceph release in container image
+    - name: check ceph release in container image
       when:
         - groups.get(mon_group_name, []) | length > 0
         - containerized_deployment | bool
       delegate_to: "{{ groups[mon_group_name][0] }}"
       run_once: true
       block:
-        - name: Get the ceph release being deployed
-          ansible.builtin.command: "{{ ceph_cmd }} --cluster {{ cluster }} --version"
+        - name: get the ceph release being deployed
+          command: "{{ ceph_cmd }} --cluster {{ cluster }} --version"
           register: ceph_version
           changed_when: false
 
-        - name: Check ceph release being deployed
-          ansible.builtin.fail:
-            msg: "This version of ceph-ansible is intended for upgrading to Ceph Squid only."
-          when: "'squid' not in ceph_version.stdout.split()"
+        - name: check ceph release being deployed
+          fail:
+            msg: "This version of ceph-ansible is intended for upgrading to Ceph Quincy only."
+          when: "'quincy' not in ceph_version.stdout.split()"
 
 
-- name: Upgrade ceph mon cluster
+- name: upgrade ceph mon cluster
   tags: mons
   vars:
     health_mon_check_retries: 5
     health_mon_check_delay: 15
-    upgrade_ceph_packages: true
+    upgrade_ceph_packages: True
   hosts: "{{ mon_group_name|default('mons') }}"
   serial: 1
-  become: true
+  become: True
   gather_facts: false
   tasks:
-    - name: Import ceph-defaults role
-      ansible.builtin.import_role:
-        name: ceph-defaults
-
-    - name: Upgrade ceph mon cluster
+    - name: upgrade ceph mon cluster
       block:
-        - name: Remove ceph aliases
-          ansible.builtin.file:
+        - name: remove ceph aliases
+          file:
             path: /etc/profile.d/ceph-aliases.sh
             state: absent
           when: containerized_deployment | bool
 
-        - name: Set mon_host_count
-          ansible.builtin.set_fact:
+        - name: set mon_host_count
+          set_fact:
             mon_host_count: "{{ groups[mon_group_name] | length }}"
 
-        - name: Fail when less than three monitors
-          ansible.builtin.fail:
+        - name: fail when less than three monitors
+          fail:
             msg: "Upgrade of cluster with less than three monitors is not supported."
           when: mon_host_count | int < 3
 
-        - name: Select a running monitor
-          ansible.builtin.set_fact:
+        - name: select a running monitor
+          set_fact:
             mon_host: "{{ groups[mon_group_name] | difference([inventory_hostname]) | last }}"
 
-        - name: Import ceph-facts role
-          ansible.builtin.import_role:
+        - import_role:
+            name: ceph-defaults
+        - import_role:
             name: ceph-facts
 
-        - name: Check Ceph monitors quorum status
-          when: inventory_hostname == groups[mon_group_name] | first
-          block:
-            - name: Get ceph cluster status
-              ansible.builtin.command: "{{ container_exec_cmd }} ceph --cluster {{ cluster }} health -f json"
+        - block:
+            - name: get ceph cluster status
+              command: "{{ container_exec_cmd }} ceph --cluster {{ cluster }} health -f json"
               register: check_cluster_health
               delegate_to: "{{ mon_host }}"
-              changed_when: false
 
-            - name: Display health status before failing
-              when: (check_cluster_health.stdout | from_json).status == 'HEALTH_ERR'
-              block:
-                - name: Display ceph health detail
-                  ansible.builtin.command: "{{ container_exec_cmd }} ceph --cluster {{ cluster }} health detail"
+            - block:
+                - name: display ceph health detail
+                  command: "{{ container_exec_cmd }} ceph --cluster {{ cluster }} health detail"
                   delegate_to: "{{ mon_host }}"
-                  changed_when: false
 
-                - name: Fail if cluster isn't in an acceptable state
-                  ansible.builtin.fail:
+                - name: fail if cluster isn't in an acceptable state
+                  fail:
                     msg: "cluster is not in an acceptable state!"
+              when: (check_cluster_health.stdout | from_json).status == 'HEALTH_ERR'
 
-            - name: Get the ceph quorum status
-              ansible.builtin.command: "{{ container_exec_cmd }} ceph --cluster {{ cluster }} quorum_status -f json"
+            - name: get the ceph quorum status
+              command: "{{ container_exec_cmd }} ceph --cluster {{ cluster }} quorum_status -f json"
               register: check_quorum_status
               delegate_to: "{{ mon_host }}"
-              changed_when: false
 
-            - name: Fail if the cluster quorum isn't in an acceptable state
-              ansible.builtin.fail:
+            - name: fail if the cluster quorum isn't in an acceptable state
+              fail:
                 msg: "cluster quorum is not in an acceptable state!"
               when: (check_quorum_status.stdout | from_json).quorum | length != groups[mon_group_name] | length
+          when: inventory_hostname == groups[mon_group_name] | first
 
-        - name: Ensure /var/lib/ceph/bootstrap-rbd-mirror is present
-          ansible.builtin.file:
+        - name: ensure /var/lib/ceph/bootstrap-rbd-mirror is present
+          file:
             path: /var/lib/ceph/bootstrap-rbd-mirror
             owner: "{{ ceph_uid if containerized_deployment | bool else 'ceph' }}"
             group: "{{ ceph_uid if containerized_deployment | bool else 'ceph' }}"
@@ -220,7 +214,7 @@
             - cephx | bool
             - inventory_hostname == groups[mon_group_name][0]
 
-        - name: Create potentially missing keys (rbd and rbd-mirror)
+        - name: create potentially missing keys (rbd and rbd-mirror)
           ceph_key:
             name: "client.{{ item.0 }}"
             dest: "/var/lib/ceph/{{ item.0 }}/"
@@ -240,65 +234,56 @@
 
         # NOTE: we mask the service so the RPM can't restart it
         # after the package gets upgraded
-        - name: Stop ceph mon
-          ansible.builtin.systemd:
+        - name: stop ceph mon
+          systemd:
             name: ceph-mon@{{ item }}
             state: stopped
-            enabled: false
-            masked: true
+            enabled: no
+            masked: yes
           with_items:
             - "{{ ansible_facts['hostname'] }}"
             - "{{ ansible_facts['fqdn'] }}"
 
         # only mask the service for mgr because it must be upgraded
         # after ALL monitors, even when collocated
-        - name: Mask the mgr service
-          ansible.builtin.systemd:
+        - name: mask the mgr service
+          systemd:
             name: ceph-mgr@{{ ansible_facts['hostname'] }}
-            masked: true
+            masked: yes
           when: inventory_hostname in groups[mgr_group_name] | default([])
                 or groups[mgr_group_name] | default([]) | length == 0
 
-        - name: Import ceph-handler role
-          ansible.builtin.import_role:
+        - import_role:
             name: ceph-handler
-
-        - name: Import ceph-common role
-          ansible.builtin.import_role:
+        - import_role:
             name: ceph-common
           when: not containerized_deployment | bool
-
-        - name: Import ceph-container-common role
-          ansible.builtin.import_role:
+        - import_role:
             name: ceph-container-common
           when: containerized_deployment | bool
-
-        - name: Import ceph-config role
-          ansible.builtin.import_role:
+        - import_role:
             name: ceph-config
-
-        - name: Import ceph-mon role
-          ansible.builtin.import_role:
+        - import_role:
             name: ceph-mon
 
-        - name: Start ceph mgr
-          ansible.builtin.systemd:
+        - name: start ceph mgr
+          systemd:
             name: ceph-mgr@{{ ansible_facts['hostname'] }}
             state: started
-            enabled: true
-            masked: false
+            enabled: yes
+            masked: no
           when: inventory_hostname in groups[mgr_group_name] | default([])
                 or groups[mgr_group_name] | default([]) | length == 0
 
-        - name: Import_role ceph-facts
-          ansible.builtin.import_role:
+        - name: import_role ceph-facts
+          import_role:
             name: ceph-facts
             tasks_from: set_monitor_address.yml
           delegate_to: "{{ groups[mon_group_name][0] }}"
           delegate_facts: true
 
-        - name: Non container | waiting for the monitor to join the quorum...
-          ansible.builtin.command: ceph --cluster "{{ cluster }}" -m "{{ _monitor_addresses[groups['mons'][0]] }}" quorum_status --format json
+        - name: non container | waiting for the monitor to join the quorum...
+          command: ceph --cluster "{{ cluster }}" -m "{{ hostvars[groups[mon_group_name][0]]['_current_monitor_address'] }}" quorum_status --format json
           register: ceph_health_raw
           until:
             - ceph_health_raw.rc == 0
@@ -306,12 +291,11 @@
               hostvars[inventory_hostname]['ansible_facts']['fqdn'] in (ceph_health_raw.stdout | default('{}') | from_json)["quorum_names"])
           retries: "{{ health_mon_check_retries }}"
           delay: "{{ health_mon_check_delay }}"
-          changed_when: false
           when: not containerized_deployment | bool
 
-        - name: Container | waiting for the containerized monitor to join the quorum...
-          ansible.builtin.command: >
-            {{ container_binary }} exec ceph-mon-{{ ansible_facts['hostname'] }} ceph --cluster "{{ cluster }}" -m "{{ _monitor_addresses[groups['mons'][0]] }}" quorum_status --format json
+        - name: container | waiting for the containerized monitor to join the quorum...
+          command: >
+            {{ container_binary }} exec ceph-mon-{{ ansible_facts['hostname'] }} ceph --cluster "{{ cluster }}" -m "{{ hostvars[groups[mon_group_name][0]]['_current_monitor_address'] }}" quorum_status --format json
           register: ceph_health_raw
           until:
             - ceph_health_raw.rc == 0
@@ -319,148 +303,110 @@
               hostvars[inventory_hostname]['ansible_facts']['fqdn'] in (ceph_health_raw.stdout | default('{}') | from_json)["quorum_names"])
           retries: "{{ health_mon_check_retries }}"
           delay: "{{ health_mon_check_delay }}"
-          changed_when: false
           when: containerized_deployment | bool
       rescue:
-        - name: Import ceph-defaults role
-          ansible.builtin.import_role:
-            name: ceph-defaults
-
-        - name: Unmask the mon service
-          ansible.builtin.systemd:
+        - name: unmask the mon service
+          systemd:
             name: ceph-mon@{{ ansible_facts['hostname'] }}
-            enabled: true
-            masked: false
+            enabled: yes
+            masked: no
 
-        - name: Unmask the mgr service
-          ansible.builtin.systemd:
+        - name: unmask the mgr service
+          systemd:
             name: ceph-mgr@{{ ansible_facts['hostname'] }}
-            masked: false
+            masked: no
           when: inventory_hostname in groups[mgr_group_name] | default([])
                 or groups[mgr_group_name] | default([]) | length == 0
 
-        - name: Stop the playbook execution
-          ansible.builtin.fail:
+        - name: stop the playbook execution
+          fail:
             msg: "There was an error during monitor upgrade. Please, check the previous task results."
 
-- name: Reset mon_host
+- name: reset mon_host
   hosts: "{{ mon_group_name|default('mons') }}"
   tags: always
-  become: true
+  become: True
   gather_facts: false
   tasks:
-    - name: Import ceph-defaults role
-      ansible.builtin.import_role:
+    - import_role:
         name: ceph-defaults
 
-    - name: Reset mon_host fact
-      ansible.builtin.set_fact:
+    - name: reset mon_host fact
+      set_fact:
         mon_host: "{{ groups[mon_group_name][0] }}"
 
 
-- name: Upgrade ceph mgr nodes when implicitly collocated on monitors
+- name: upgrade ceph mgr nodes when implicitly collocated on monitors
   vars:
     health_mon_check_retries: 5
     health_mon_check_delay: 15
-    upgrade_ceph_packages: true
+    upgrade_ceph_packages: True
   hosts: "{{ mon_group_name|default('mons') }}"
   tags: mgrs
   serial: 1
-  become: true
+  become: True
   gather_facts: false
   tasks:
-    - name: Upgrade mgrs when no mgr group explicitly defined in inventory
+    - name: upgrade mgrs when no mgr group explicitly defined in inventory
       when: groups.get(mgr_group_name, []) | length == 0
       block:
-        - name: Stop ceph mgr
-          ansible.builtin.systemd:
+        - name: stop ceph mgr
+          systemd:
             name: ceph-mgr@{{ ansible_facts['hostname'] }}
             state: stopped
-            masked: true
+            masked: yes
 
-        - name: Import ceph-defaults role
-          ansible.builtin.import_role:
+        - import_role:
             name: ceph-defaults
-
-        - name: Import ceph-facts role
-          ansible.builtin.import_role:
+        - import_role:
             name: ceph-facts
-
-        - name: Import ceph-handler role
-          ansible.builtin.import_role:
+        - import_role:
             name: ceph-handler
-
-        - name: Import ceph-common role
-          ansible.builtin.import_role:
+        - import_role:
             name: ceph-common
           when: not containerized_deployment | bool
-
-        - name: Import ceph-container-common role
-          ansible.builtin.import_role:
+        - import_role:
             name: ceph-container-common
           when: containerized_deployment | bool
-
-        - name: Import ceph-config role
-          ansible.builtin.import_role:
+        - import_role:
             name: ceph-config
-
-        - name: Import ceph-mgr role
-          ansible.builtin.import_role:
+        - import_role:
             name: ceph-mgr
 
-- name: Upgrade ceph mgr nodes
+- name: upgrade ceph mgr nodes
   vars:
-    upgrade_ceph_packages: true
+    upgrade_ceph_packages: True
     ceph_release: "{{ ceph_stable_release }}"
   hosts: "{{ mgr_group_name|default('mgrs') }}"
   tags: mgrs
   serial: 1
-  become: true
+  become: True
   gather_facts: false
   tasks:
     # The following task has a failed_when: false
     # to handle the scenario where no mgr existed before the upgrade
     # or if we run a Ceph cluster before Luminous
-    - name: Stop ceph mgr
-      ansible.builtin.systemd:
+    - name: stop ceph mgr
+      systemd:
         name: ceph-mgr@{{ ansible_facts['hostname'] }}
         state: stopped
-        enabled: false
-        masked: false
+        enabled: no
+        masked: yes
       failed_when: false
 
-    - name: Mask ceph mgr systemd unit
-      ansible.builtin.systemd:
-        name: ceph-mgr@{{ ansible_facts['hostname'] }}
-        masked: true
-      failed_when: false
-
-    - name: Import ceph-defaults role
-      ansible.builtin.import_role:
+    - import_role:
         name: ceph-defaults
-
-    - name: Import ceph-facts role
-      ansible.builtin.import_role:
+    - import_role:
         name: ceph-facts
-
-    - name: Import ceph-handler role
-      ansible.builtin.import_role:
+    - import_role:
         name: ceph-handler
-
-    - name: Import ceph-common role
-      ansible.builtin.import_role:
+    - import_role:
         name: ceph-common
       when: not containerized_deployment | bool
-
-    - name: Import ceph-container-common role
-      ansible.builtin.import_role:
+    - import_role:
         name: ceph-container-common
       when: containerized_deployment | bool
-
-    - name: Import ceph-config role
-      ansible.builtin.import_role:
+    - import_role:
         name: ceph-config
-
-    - name: Import ceph-mgr role
-      ansible.builtin.import_role:
+    - import_role:
         name: ceph-mgr
