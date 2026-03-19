@@ -1,0 +1,10 @@
+- name: Disable Puppet
+  hosts: mons, osds, mdss, rgws
+  gather_facts: no
+  ignore_errors: yes
+  ignore_unreachable: yes
+  tasks:
+#  - name: enable puppet
+#    command: puppet agent --enable
+  - name: puppet run
+    command: puppet agent -t

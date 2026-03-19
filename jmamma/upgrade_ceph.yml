@@ -1,0 +1,11 @@
+- name: Upgrade ceph packages
+  hosts: osds
+  throttle: 5
+  gather_facts: no
+  ignore_errors: yes
+  ignore_unreachable: yes
+  tasks:
+  - name: run puppet
+    command: puppet agent -t
+  - name: update packages
+    command: yum update ceph-common -y

@@ -1,0 +1,12 @@
+
+- name: Activate OSDS
+  hosts: newosds
+  serial: 1
+  gather_facts: no
+  ignore_errors: yes
+  ignore_unreachable: yes
+  tasks:
+  - name: activate ceph osds daemon(s)
+    command: ceph-volume lvm activate --all
+ 
+

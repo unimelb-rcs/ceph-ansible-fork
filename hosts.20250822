@@ -8,13 +8,15 @@ mon[1:5]a-ceph3-qh2
 mon[1:5]a-ceph3-qh2
 
 [restartosds]
+mf[60:94]-ceph3-qh2
 
 [osds]
 mf[1:5]-ceph3-qh2
-mf[65:94]-ceph3-qh2
+mf[56:59]-ceph3-qh2
+mf[60:94]-ceph3-qh2
 mf[101:117]-ceph3-qh2
-mf[118:128]-ceph3-qh2
 obj[1:5]-ceph3-qh2
+obj[21:27]-ceph3-qh2
 mf[25:26]-ceph3-qh2
 mf[6:10]-ceph3-qh2
 mf[95:99]-ceph3-qh2
@@ -24,13 +26,33 @@ mf[38:40]-ceph3-qh2
 mf[27:31]-ceph3-qh2
 mf[47:49]-ceph3-qh2
 obj[6:9]-ceph3-qh2
-obj[10:12]-ceph3-qh2
+
+[routing_issue]
+mf[60:88]-ceph3-qh2
+obj[6:9]-ceph3-qh2
+mf[29:31]-ceph3-qh2
+
+[subnet_issue]
+mf[41:46]-ceph3-qh2
+mf[95:99]-ceph3-qh2
+mf[101:105]-ceph3-qh2
 
 [newosds]
+mf[38:40]-ceph3-qh2
 
-[fw_upgrade]
+[newosds_meta]
+obj6-ceph3-qh2
+mf49-ceph3-qh2
+mf28-ceph3-qh2
+#mf30-ceph3-qh2
+mf29-ceph3-qh2
+mf27-ceph3-qh2
+mf47-ceph3-qh2
+mf48-ceph3-qh2
 
 [newosds_nonmeta]
+obj[7:9]-ceph3-qh2
+mf31-ceph3-qh2
 
 [mdss]
 mds[1:2]a-ceph3-qh2
@@ -42,4 +64,3 @@ rgw[1:2]a-ceph3-qh2
 
 [draining]
 
-[newobjs]

@@ -1,0 +1,70 @@
+---
+
+- name: Perform full system update on osd nodes
+  hosts: dsuosdsnew
+  #strategy: free
+  #serial: 1  # Ensures one host is processed at a time
+  gather_facts: no
+
+  tasks:
+  - name: copy dsu bootstrap
+    copy:
+     src: bootstrap.sh
+     dest: /tmp/bootstrap.sh
+     owner: root
+     group: root
+     mode: 0750
+
+  - name: run dsu bootstrap
+    shell: /usr/bin/env bash /tmp/bootstrap.sh
+    become: yes
+
+  - name: Install dell-system-update
+    yum:
+      name: dell-system-update
+      state: present
+    become: yes
+ 
+  - name: Remove output file
+    command: rm -f 'dsu_output.xml'
+    args:
+      chdir: "/tmp"  # Specify the directory where you want to store the inventory XML file
+
+  - name: Generate inventory XML file
+    command: dsu --output-inventory-xml=dsu_output.xml
+    args:
+      chdir: "/tmp"  # Specify the directory where you want to store the inventory XML file
+
+  - name: Convert UTF-16 to UTF-8
+    command: "iconv -f UTF-16 -t UTF-8 dsu_output.xml -o dsu_output_utf8.xml"
+    args:
+      chdir: "/tmp"  # Specify the directory where dsu_output.xml is located
+
+  - name: Remove lines containing 'NVME' or 'NVMe' along with the following two lines
+    command: "sed -i '/NVME\\|NVMe/{N;N;d;}' dsu_output_utf8.xml"
+    args:
+      chdir: "/tmp"  # Specify the directory where dsu_output_utf8.xml is located
+
+  - name: Convert UTF-8 to UTF-16
+    command: "iconv -f UTF-8 -t UTF-16 dsu_output_utf8.xml -o dsu_output_utf16.xml"
+    args:
+      chdir: "/tmp"  # Specify the directory where dsu_output_utf8.xml is located
+
+  - name: Execute dsu with -n option
+    command: dsu --input-inventory-file=dsu_output_utf16.xml -n
+    args:
+      chdir: "/tmp"  # Specify the directory where dsu_output_utf16.xml is located
+    ignore_errors: true
+    register: dsu_output
+ 
+  - name: Update all packages
+    yum:
+      name: "*"
+      state: latest
+
+  - name: Reboot the node
+    reboot:
+      reboot_timeout: 3600  # Adjust this as needed; it's the time in seconds for how long to wait for the machine to reboot.
+    when: "'No Applicable Update(s) Available' not in dsu_output.stdout"
+    become: yes
+
