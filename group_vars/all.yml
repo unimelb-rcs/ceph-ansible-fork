@@ -552,7 +552,7 @@ ceph_conf_overrides:
   global:
     mon_max_pg_per_osd: 300
     osd_deep_scrub_interval: 1209600
-    osd_scrub_max_interval: 2419200
+    osd_scrub_max_interval: 3024000
 
   osd:
     bluestore_cache_size: 2147483648

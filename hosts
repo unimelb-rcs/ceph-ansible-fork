@@ -11,6 +11,7 @@ mon[1:5]a-ceph1-qh2
 stg[42:68]-ceph1-qh2
 flash[1:10]-ceph1-qh2
 stg[8:15]-ceph1-qh2
+flash[11:15]-ceph1-qh2
 
 [upgradeosds]
 stg[67:68]-ceph1-qh2
@@ -27,7 +28,7 @@ stg[46:68]-ceph1-qh2
 stg[9:15]-ceph1-qh2
 
 [newosds]
-stg[8:15]-ceph1-qh2
+flash[11:15]-ceph1-qh2
 
 [dsuosds]
 stg44-ceph1-qh2
