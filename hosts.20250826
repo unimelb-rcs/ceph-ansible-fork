@@ -12,19 +12,18 @@ mon2a-ceph1-np
 mon1a-ceph1-np
 
 [osds]
-mfx[73:80]-ceph1-np
-mfx[83:86]-ceph1-np
+mfx[64:86]-ceph1-np
 mfx[93:96]-ceph1-np
+mfx[102:107]-ceph1-np
 mfx[1:11]-ceph1-np
 mfx[12:16]-ceph1-np
-mfx[17:19]-ceph1-np
+mfx[17-19]-ceph1-np
 
 [upgradeosds]
 
 [test]
 
 [dsuosds-parallel]
-mfx95-ceph1-np
 
 [rebuilt-osds]
 mfx17-ceph1-np
@@ -37,6 +36,5 @@ mfx17-ceph1-np
 mds[1:2]a-ceph1-np
 
 [draining]
-mfx[17:19]-ceph1-np
 
 [complete]
