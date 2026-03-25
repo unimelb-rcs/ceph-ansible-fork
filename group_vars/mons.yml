@@ -1,0 +1,3 @@
+ceph_conf_overrides:
+  mon:
+    mon_data_size_warn: 48318382080

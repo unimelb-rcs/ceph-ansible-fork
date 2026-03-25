@@ -1,0 +1,29 @@
+ceph_conf_overrides:
+  mds:
+    mds_cache_memory_limit: 159104409600
+    mds_client_prealloc_inos: 20000
+    mds_bal_frag: true
+    mds_bal_split_size: 10000
+    mds_bal_fragment_size_max: 500000
+    mds_log_max_segments: 240
+    mds_log_max_expiring: 160
+    mds_cache_trim_threshold: 262144
+    mds_recall_max_caps: 30000
+    mds_recall_max_decay_rate: 1.5
+    mds_recall_max_decay_threshold: 131072
+    mds_recall_global_max_decay_threshold: 131072
+    mds_recall_warning_threshold: 262144
+  mds.mds1a-ceph1-np:
+    host: 'mds1a-ceph1-np'
+    mds join fs: mf1fs
+  mds.mds2a-ceph1-np:
+    host: 'mds2a-ceph1-np'
+    mds join fs: mf1fs
+    mds standby for name: mds1a-ceph1-np
+  mds.mds2a2-ceph1-np:
+    host: 'mds2a-ceph1-np'
+    mds join fs: mf1fs2
+  mds.mds1a2-ceph1-np:
+    host: 'mds1a-ceph1-np'
+    mds join fs: mf1fs2
+    mds standby for name: mds2a2-ceph1-np
