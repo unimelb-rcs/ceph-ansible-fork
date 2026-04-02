@@ -131,8 +131,8 @@
 
         - name: Check ceph release being deployed
           ansible.builtin.fail:
-            msg: "This version of ceph-ansible is intended for upgrading to Ceph Squid only."
-          when: "'squid' not in ceph_version.stdout.split()"
+            msg: "This version of ceph-ansible is intended for upgrading to Ceph Tentacle only."
+          when: "'tentacle' not in ceph_version.stdout.split()"
 
 
 - name: Upgrade ceph mon cluster
