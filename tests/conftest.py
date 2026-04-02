@@ -145,6 +145,7 @@ def node(host, request):
         'quincy': 17,
         'reef': 18,
         'squid': 19,
+        'tentacle': 20,
         'dev': 99
     }
 

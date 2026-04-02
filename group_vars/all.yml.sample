@@ -33,6 +33,7 @@ dummy:
 #  quincy: 17
 #  reef: 18
 #  squid: 19
+#  tentacle: 20
 #  dev: 99
 
 
@@ -155,7 +156,7 @@ dummy:
 #
 #ceph_mirror: https://download.ceph.com
 #ceph_stable_key: https://download.ceph.com/keys/release.asc
-#ceph_stable_release: squid
+#ceph_stable_release: tentacle
 #ceph_stable_repo: "{{ ceph_mirror }}/debian-{{ ceph_stable_release }}"
 
 #nfs_ganesha_stable: true # use stable repos for nfs-ganesha
